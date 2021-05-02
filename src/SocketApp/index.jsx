@@ -24,7 +24,7 @@ const AppWs = () => {
   const [isPaused, setPause] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [receivedData, setReceivedData] = useState(undefined);
-  const [inputValue, setInputValue] = useState(undefined);
+  const [messageValue, setMessageValue] = useState(undefined);
   const ws = useRef(null);
 
   const allMessages = receivedData ? JSON.parse(receivedData) : [];
@@ -63,8 +63,8 @@ const AppWs = () => {
         return;
       }
       // const message = JSON.parse(e.data);
-      setReceivedData(e.data);
       console.log({ received_data: e.data });
+      setReceivedData(e.data);
     };
   }, [ws?.current?.onmessage, isPaused]);
 
@@ -81,15 +81,17 @@ const AppWs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    ws.current.send(inputValue);
+    ws.current.send(messageValue);
   };
 
   const handleChange = (e) => {
-    setInputValue({
+    const jsonObject = JSON.stringify({
       user_id: 123,
       room_id: 456,
       message: e.target.value,
     });
+
+    setMessageValue(jsonObject);
   };
 
   return (
