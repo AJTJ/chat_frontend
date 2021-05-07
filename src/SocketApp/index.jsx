@@ -1,24 +1,31 @@
 import React, { useState, useRef, useEffect } from "react";
 
-// #[derive(Serialize, Deserialize, Debug)]
-// struct User {
-//     id: Option<i64>,
-//     name: Option<String>,
-// }
+/**
+#[derive(Serialize, Deserialize, Debug)]
+struct User {
+    id: i64,
+    name: String,
+}
 
-// #[derive(Serialize, Deserialize, Debug)]
-// struct Message {
-//     id: Option<i64>,
-//     user_id: i64,
-//     room_id: i64,
-//     message: String,
-//     time: chrono::NaiveDateTime,
-// }
-// #[derive(Serialize, Deserialize, Debug)]
-// struct Room {
-//     id: Option<i64>,
-//     name: Option<String>,
-// }
+#[derive(Serialize, Deserialize, Debug)]
+struct DatabaseMessage {
+    id: i64,
+    user_id: i64,
+    room_id: i64,
+    message: String,
+    #[serde(default = "default_time")]
+    time: NaiveDateTime,
+}
+
+fn default_time() -> NaiveDateTime {
+    Utc::now().naive_utc()
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct Room {
+    id: i64,
+    name: String,
+}
+ */
 
 const AppWs = () => {
   const [isPaused, setPause] = useState(false);
@@ -84,6 +91,7 @@ const AppWs = () => {
     ws.current.send(messageValue);
   };
 
+  // Eventually user_id should be set somewhere and same with room_id
   const handleChange = (e) => {
     const jsonObject = JSON.stringify({
       user_id: 123,
