@@ -19,17 +19,15 @@ struct DatabaseMessage {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ClientResponse {
+struct FromClient {
     message: String,
-    is_sign_in: bool,
-    is_sign_up: bool,
     user_name: String,
     password: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ClientMessage {
-    user_id: i64,
+struct SentToClient {
+    user_name: String,
     room_id: i64,
     message: String,
     #[serde(default = "default_time")]
@@ -69,12 +67,11 @@ struct WebSockActor {
 const socket_address = "ws://127.0.0.1:8081/ws/";
 const api_address = "http://127.0.0.1:8081";
 
-const AppWs = () => {
+const AppWs = ({ user, setUser, ws, openSocket }) => {
   const [isPaused, setPause] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [receivedData, setReceivedData] = useState(undefined);
   const [messageValue, setMessageValue] = useState(undefined);
-  const ws = useRef(null);
 
   const receivedDataJSON = receivedData ? JSON.parse(receivedData) : {};
 
@@ -84,23 +81,15 @@ const AppWs = () => {
     ? JSON.parse(receivedDataJSON.all_messages)
     : [];
 
-  const openSocket = () => {
-    ws.current = new WebSocket(socket_address);
-    console.log(`current: ${ws.current}`);
-    ws.current.onopen = () => {
-      console.log("ws opened");
-    };
-    ws.current.onclose = () => console.log("ws closed");
-  };
-
   // open the socket on page load
   useEffect(() => {
     openSocket();
     setIsOpen(true);
 
+    const currentWS = ws?.current;
     return () => {
       // close the socket if it exists
-      ws?.current?.close();
+      currentWS?.close();
     };
   }, []);
 
@@ -149,7 +138,7 @@ const AppWs = () => {
   // Eventually user_id should be set somewhere and same with room_id
   const handleChange = (e) => {
     const jsonObject = JSON.stringify({
-      user_id: 123,
+      user_name: "Henry",
       room_id: 456,
       message: e.target.value,
     });
@@ -183,19 +172,38 @@ const AppWs = () => {
   );
 };
 
-const SignUp = () => {
-  const [userName, setUserName] = useState(undefined);
-  const [password, setPassword] = useState(undefined);
+const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
   const handleSignUp = (e) => {
     e.preventDefault();
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/signup/`, requestOptions).then((response) =>
-      console.log("the signup response:", response)
-    );
+    fetch(`${api_address}/signup/`, requestOptions).then((response) => {
+      console.log("the signup response:", response);
+      ws?.current?.close();
+      // openSocket();
+    });
+  };
+
+  const handleSignIn = (e) => {
+    e.preventDefault();
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ user_name: userName, password: password }),
+    };
+    fetch(`${api_address}/login/`, requestOptions).then((response) => {
+      console.log("the login response:", response);
+      ws?.current?.close();
+      // openSocket();
+    });
   };
 
   const handleUserChange = (e) => {
@@ -207,11 +215,19 @@ const SignUp = () => {
 
   return (
     <div>
-      <div>Login</div>
-      <form onSubmit={handleSignUp}>
+      <button onClick={() => setIsLogin(!isLogin)}>
+        {isLogin ? "SignUp" : "Login"}
+      </button>
+      <div>{isLogin ? "Login" : "SignUp"}</div>
+      <form onSubmit={isLogin ? handleSignIn : handleSignUp}>
         <label htmlFor="userInput">
           Name
-          <input id="userInput" type="text" onChange={handleUserChange} />
+          <input
+            id="userInput"
+            type="text"
+            onChange={handleUserChange}
+            value={userName}
+          />
         </label>
         <label htmlFor="passwordInput">
           password
@@ -219,6 +235,7 @@ const SignUp = () => {
             id="passwordInput"
             type="password"
             onChange={handlePasswordChange}
+            value={password}
           />
         </label>
         <input type="submit" />
@@ -228,11 +245,39 @@ const SignUp = () => {
 };
 
 const App = () => {
+  const [user, setUser] = useState("");
+  const ws = useRef(null);
+
+  const openSocket = () => {
+    ws.current = new WebSocket(socket_address);
+    console.log(`current: ${ws.current}`);
+    ws.current.onopen = () => {
+      console.log("ws opened");
+    };
+    ws.current.onclose = () => console.log("ws closed");
+  };
+
+  const testLogout = (e) => {
+    e.preventDefault();
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      // body: JSON.stringify({ user_name: userName, password: password }),
+    };
+    fetch(`${api_address}/logout/`, requestOptions).then((response) => {
+      console.log("the logout response:", response);
+      ws?.current?.close();
+      // openSocket();
+    });
+  };
+
   return (
     <div>
       <div>WS APP</div>
-      <SignUp />
-      <AppWs />
+      <SignUpLogin {...{ user, setUser, ws, openSocket }} />
+      <AppWs {...{ user, ws, setUser, openSocket }} />
+      <button onClick={testLogout} />
     </div>
   );
 };
