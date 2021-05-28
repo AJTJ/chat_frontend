@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-
+// test again again
 /**
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -64,7 +64,7 @@ struct WebSockActor {
 
  */
 
-const socket_address = "ws://127.0.0.1:8081/ws/";
+const ws_address = "ws://127.0.0.1:8081";
 const api_address = "http://127.0.0.1:8081";
 
 const AppWs = ({ user, setUser, ws, openSocket }) => {
@@ -75,7 +75,7 @@ const AppWs = ({ user, setUser, ws, openSocket }) => {
 
   const receivedDataJSON = receivedData ? JSON.parse(receivedData) : {};
 
-  console.log({ json: receivedDataJSON?.all_messages });
+  console.log({ received_json_messages: receivedDataJSON?.all_messages });
 
   const allMessages = receivedDataJSON?.all_messages
     ? JSON.parse(receivedDataJSON.all_messages)
@@ -99,6 +99,8 @@ const AppWs = ({ user, setUser, ws, openSocket }) => {
       console.log("no ws.current");
     }
 
+    console.log({ ws, current_onmessage: ws.current });
+
     ws.current.onmessage = (e) => {
       if (isPaused) {
         console.log("is paused");
@@ -108,7 +110,7 @@ const AppWs = ({ user, setUser, ws, openSocket }) => {
       console.log({ received_data: e.data });
       setReceivedData(e.data);
     };
-  }, [ws?.current?.onmessage, isPaused]);
+  }, [ws, isPaused]);
 
   // open change
   const handleOpenChange = () => {
@@ -186,7 +188,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/signup/`, requestOptions).then((response) => {
       console.log("the signup response:", response);
-      ws?.current?.close();
+      // ws?.current?.close();
       // openSocket();
     });
   };
@@ -201,7 +203,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/login/`, requestOptions).then((response) => {
       console.log("the login response:", response);
-      ws?.current?.close();
+      // ws?.current?.close();
       // openSocket();
     });
   };
@@ -249,8 +251,7 @@ const App = () => {
   const ws = useRef(null);
 
   const openSocket = () => {
-    ws.current = new WebSocket(socket_address);
-    console.log(`current: ${ws.current}`);
+    ws.current = new WebSocket(`${ws_address}/ws/`);
     ws.current.onopen = () => {
       console.log("ws opened");
     };
@@ -267,14 +268,14 @@ const App = () => {
     };
     fetch(`${api_address}/logout/`, requestOptions).then((response) => {
       console.log("the logout response:", response);
-      ws?.current?.close();
+      // ws?.current?.close();
       // openSocket();
     });
   };
 
   return (
     <div>
-      <div>WS APP</div>
+      <div>WS APP HERE YALL!</div>
       <SignUpLogin {...{ user, setUser, ws, openSocket }} />
       <AppWs {...{ user, ws, setUser, openSocket }} />
       <button onClick={testLogout} />
