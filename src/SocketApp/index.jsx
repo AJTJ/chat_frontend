@@ -133,8 +133,7 @@ const AppWs = ({ user, setUser, ws, openSocket }) => {
       user_name: "Henry",
       password: "password",
     });
-
-    ws.current.send(jsonObject);
+    ws?.current?.send && ws?.current?.send(jsonObject);
   };
 
   // Eventually user_id should be set somewhere and same with room_id
@@ -255,7 +254,12 @@ const App = () => {
     ws.current.onopen = () => {
       console.log("ws opened");
     };
-    ws.current.onclose = () => console.log("ws closed");
+    ws.current.onclose = () => {
+      console.log("ws closed, attempting to reconnect");
+      setTimeout(() => {
+        openSocket();
+      }, 1000);
+    };
   };
 
   const testLogout = (e) => {
