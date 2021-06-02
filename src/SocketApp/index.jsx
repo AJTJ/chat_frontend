@@ -89,16 +89,29 @@ const AppWs = ({
 
     console.log({ receivedJson: receivedDataJSON });
 
-    if (receivedDataJSON?.all_messages)
+    if (receivedDataJSON?.all_messages) {
       setAllMessages(JSON.parse(receivedDataJSON.all_messages));
+    } else {
+      setAllMessages([]);
+    }
 
-    if (receivedDataJSON?.message_to_client)
+    if (receivedDataJSON?.message_to_client) {
       setWsMessage(receivedDataJSON.message_to_client);
+    } else {
+      setWsMessage(undefined);
+    }
 
-    if (receivedDataJSON?.user_name)
+    if (receivedDataJSON?.user_name) {
       setSignedInUser(receivedDataJSON.user_name);
+    } else {
+      setSignedInUser(undefined);
+    }
 
-    if (receivedDataJSON?.all_users) setAllUsers(receivedDataJSON.all_users);
+    if (receivedDataJSON?.all_users) {
+      setAllUsers(receivedDataJSON.all_users);
+    } else {
+      setAllUsers([]);
+    }
   }, [receivedData]);
 
   // open the socket on page load
@@ -171,25 +184,30 @@ const AppWs = ({
         ) : (
           <>
             {signedInUser && <div>Signed in as: {signedInUser}</div>}
-            <div>
-              Current users:
-              {!allUsers.length ? (
-                <span>"Nobody here"</span>
-              ) : (
-                <>
-                  {allUsers.map((usr, i) => {
-                    return <span key={i + usr}>{usr}</span>;
-                  })}
-                </>
-              )}
-            </div>
+            {!!allMessages?.length && (
+              <div>
+                Current users:
+                {!allUsers.length ? (
+                  <span>Nobody here</span>
+                ) : (
+                  <>
+                    {allUsers.map((usr, i) => {
+                      return <span key={i + usr}>{usr}</span>;
+                    })}
+                  </>
+                )}
+              </div>
+            )}
             {allMessages?.map((message) => {
               return (
-                <div key={message?.time + message?.message}>
-                  <div>{message?.name}</div>
-                  <div>{message?.time}</div>
-                  <div>{message?.message}</div>
-                </div>
+                <>
+                  <div>-</div>
+                  <div key={message?.time + message?.message}>
+                    <div>{message?.name}</div>
+                    <div>{message?.time}</div>
+                    <div>{message?.message}</div>
+                  </div>
+                </>
               );
             })}
           </>
