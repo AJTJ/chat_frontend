@@ -67,24 +67,40 @@ struct WebSockActor {
 const ws_address = "ws://127.0.0.1:8081";
 const api_address = "http://127.0.0.1:8081";
 
-const AppWs = ({ user, setUser, ws, openSocket }) => {
-  const [isPaused, setPause] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [receivedData, setReceivedData] = useState(undefined);
+const AppWs = ({
+  user,
+  ws,
+  setUser,
+  openSocket,
+  receivedData,
+  setReceivedData,
+  isPaused,
+  setPause,
+  reconnecting,
+}) => {
   const [messageValue, setMessageValue] = useState(undefined);
+  const [allMessages, setAllMessages] = useState([]);
+  const [wsMessage, setWsMessage] = useState(undefined);
+  const [signedInUser, setSignedInUser] = useState(undefined);
 
-  const receivedDataJSON = receivedData ? JSON.parse(receivedData) : {};
+  useEffect(() => {
+    const receivedDataJSON = receivedData ? JSON.parse(receivedData) : {};
 
-  console.log({ received_json_messages: receivedDataJSON?.all_messages });
+    console.log({ receivedJson: receivedDataJSON });
 
-  const allMessages = receivedDataJSON?.all_messages
-    ? JSON.parse(receivedDataJSON.all_messages)
-    : [];
+    if (receivedDataJSON?.all_messages)
+      setAllMessages(JSON.parse(receivedDataJSON.all_messages));
+
+    if (receivedDataJSON?.message_to_client)
+      setWsMessage(receivedDataJSON.message_to_client);
+
+    if (receivedDataJSON?.user_name)
+      setSignedInUser(receivedDataJSON.user_name);
+  }, [receivedData]);
 
   // open the socket on page load
   useEffect(() => {
     openSocket();
-    setIsOpen(true);
 
     const currentWS = ws?.current;
     return () => {
@@ -114,12 +130,10 @@ const AppWs = ({ user, setUser, ws, openSocket }) => {
 
   // open change
   const handleOpenChange = () => {
-    if (!!isOpen) {
+    if (ws?.current) {
       ws?.current?.close();
-      setIsOpen(false);
     } else {
       openSocket();
-      setIsOpen(true);
     }
   };
 
@@ -128,23 +142,12 @@ const AppWs = ({ user, setUser, ws, openSocket }) => {
 
     const jsonObject = JSON.stringify({
       message: messageValue,
-      is_sign_in: false,
-      is_sign_up: true,
-      user_name: "Henry",
-      password: "password",
     });
     ws?.current?.send && ws?.current?.send(jsonObject);
   };
 
-  // Eventually user_id should be set somewhere and same with room_id
   const handleChange = (e) => {
-    const jsonObject = JSON.stringify({
-      user_name: "Henry",
-      room_id: 456,
-      message: e.target.value,
-    });
-
-    setMessageValue(jsonObject);
+    setMessageValue(e.target.value);
   };
 
   return (
@@ -153,21 +156,29 @@ const AppWs = ({ user, setUser, ws, openSocket }) => {
         {isPaused ? "Resume" : "Pause"}
       </button>
       <button onClick={() => handleOpenChange()}>
-        {isOpen ? "Close" : "Open"}
+        {ws?.current ? "Close" : "Open"}
       </button>
+      {!reconnecting && <div>{wsMessage && wsMessage}</div>}
       <form onSubmit={handleSubmit}>
         <input onChange={handleChange} type="text" />
       </form>
       <div>
-        {allMessages?.map((message) => {
-          return (
-            <div key={message?.time + message?.message}>
-              <div>{message?.user_id}</div>
-              <div>{message?.time}</div>
-              <div>{message?.message}</div>
-            </div>
-          );
-        })}
+        {reconnecting ? (
+          <div>Reconnecting...</div>
+        ) : (
+          <>
+            {signedInUser && <div>Signed in as: {signedInUser}</div>}
+            {allMessages?.map((message) => {
+              return (
+                <div key={message?.time + message?.message}>
+                  <div>{message?.name}</div>
+                  <div>{message?.time}</div>
+                  <div>{message?.message}</div>
+                </div>
+              );
+            })}
+          </>
+        )}
       </div>
     </div>
   );
@@ -177,6 +188,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const [authMsg, setAuthMsg] = useState(undefined);
   const handleSignUp = (e) => {
     e.preventDefault();
     const requestOptions = {
@@ -185,10 +197,8 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
       credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/signup/`, requestOptions).then((response) => {
-      console.log("the signup response:", response);
-      // ws?.current?.close();
-      // openSocket();
+    fetch(`${api_address}/signup/`, requestOptions).then((res) => {
+      res.json().then((body) => setAuthMsg(body));
     });
   };
 
@@ -200,10 +210,21 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
       credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/login/`, requestOptions).then((response) => {
-      console.log("the login response:", response);
-      // ws?.current?.close();
-      // openSocket();
+    fetch(`${api_address}/login/`, requestOptions).then((res) => {
+      res.json().then((body) => setAuthMsg(body));
+    });
+  };
+
+  const handleLogOut = (e) => {
+    e.preventDefault();
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      // body: JSON.stringify({ user_name: userName, password: password }),
+    };
+    fetch(`${api_address}/logout/`, requestOptions).then((res) => {
+      res.json().then((body) => setAuthMsg(body));
     });
   };
 
@@ -221,6 +242,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
       </button>
       <div>{isLogin ? "Login" : "SignUp"}</div>
       <form onSubmit={isLogin ? handleSignIn : handleSignUp}>
+        {authMsg && <div>{authMsg}</div>}
         <label htmlFor="userInput">
           Name
           <input
@@ -240,6 +262,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
           />
         </label>
         <input type="submit" />
+        <button onClick={handleLogOut}>Log out</button>
       </form>
     </div>
   );
@@ -248,41 +271,52 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
 const App = () => {
   const [user, setUser] = useState("");
   const ws = useRef(null);
+  const [receivedData, setReceivedData] = useState(undefined);
+  const [isPaused, setPause] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
 
   const openSocket = () => {
     ws.current = new WebSocket(`${ws_address}/ws/`);
+
     ws.current.onopen = () => {
       console.log("ws opened");
+      setReconnecting(false);
+      ws.current.onmessage = (e) => {
+        if (isPaused) {
+          console.log("is paused");
+          return;
+        }
+        // const message = JSON.parse(e.data);
+        console.log({ received_data_HERE: e.data });
+        setReceivedData(e.data);
+      };
     };
     ws.current.onclose = () => {
       console.log("ws closed, attempting to reconnect");
+      setReconnecting(true);
       setTimeout(() => {
         openSocket();
       }, 1000);
     };
   };
 
-  const testLogout = (e) => {
-    e.preventDefault();
-    const requestOptions = {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      // body: JSON.stringify({ user_name: userName, password: password }),
-    };
-    fetch(`${api_address}/logout/`, requestOptions).then((response) => {
-      console.log("the logout response:", response);
-      // ws?.current?.close();
-      // openSocket();
-    });
-  };
-
   return (
     <div>
       <div>WS APP HERE YALL!</div>
       <SignUpLogin {...{ user, setUser, ws, openSocket }} />
-      <AppWs {...{ user, ws, setUser, openSocket }} />
-      <button onClick={testLogout} />
+      <AppWs
+        {...{
+          user,
+          ws,
+          setUser,
+          openSocket,
+          receivedData,
+          setReceivedData,
+          isPaused,
+          setPause,
+          reconnecting,
+        }}
+      />
     </div>
   );
 };
