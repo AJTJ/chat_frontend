@@ -82,6 +82,7 @@ const AppWs = ({
   const [allMessages, setAllMessages] = useState([]);
   const [wsMessage, setWsMessage] = useState(undefined);
   const [signedInUser, setSignedInUser] = useState(undefined);
+  const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
     const receivedDataJSON = receivedData ? JSON.parse(receivedData) : {};
@@ -96,6 +97,8 @@ const AppWs = ({
 
     if (receivedDataJSON?.user_name)
       setSignedInUser(receivedDataJSON.user_name);
+
+    if (receivedDataJSON?.all_users) setAllUsers(receivedDataJSON.all_users);
   }, [receivedData]);
 
   // open the socket on page load
@@ -168,6 +171,18 @@ const AppWs = ({
         ) : (
           <>
             {signedInUser && <div>Signed in as: {signedInUser}</div>}
+            <div>
+              Current users:
+              {!allUsers.length ? (
+                <span>"Nobody here"</span>
+              ) : (
+                <>
+                  {allUsers.map((usr, i) => {
+                    return <span key={i + usr}>{usr}</span>;
+                  })}
+                </>
+              )}
+            </div>
             {allMessages?.map((message) => {
               return (
                 <div key={message?.time + message?.message}>
