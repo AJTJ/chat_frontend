@@ -97,7 +97,7 @@ const AppWs = ({
 
     if (receivedDataJSON?.message_to_client) {
       setWsMessage(receivedDataJSON.message_to_client);
-    } else {
+    } else if (!receivedDataJSON?.is_update) {
       setWsMessage(undefined);
     }
 
@@ -198,16 +198,16 @@ const AppWs = ({
                 )}
               </div>
             )}
-            {allMessages?.map((message) => {
+            {allMessages?.map((message, i) => {
               return (
-                <>
+                <div key={message?.message + i + message?.time}>
                   <div>-</div>
                   <div key={message?.time + message?.message}>
                     <div>{message?.name}</div>
                     <div>{message?.time}</div>
                     <div>{message?.message}</div>
                   </div>
-                </>
+                </div>
               );
             })}
           </>
