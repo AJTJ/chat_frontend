@@ -168,7 +168,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/signup/`, requestOptions).then((res) => {
       res.json().then((body) => setAuthMsg(body));
-      ws.close();
+      ws?.current?.close();
     });
   };
 
@@ -182,7 +182,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/login/`, requestOptions).then((res) => {
       res.json().then((body) => setAuthMsg(body));
-      ws.close();
+      ws?.current?.close();
     });
   };
 
@@ -196,7 +196,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/logout/`, requestOptions).then((res) => {
       res.json().then((body) => setAuthMsg(body));
-      ws.close();
+      ws?.current?.close();
     });
   };
 
