@@ -1,68 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-// test again again
-/**
-
-#[derive(Serialize, Deserialize, Debug)]
-struct User {
-    id: i64,
-    name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct DatabaseMessage {
-    id: i64,
-    user_id: i64,
-    room_id: i64,
-    message: String,
-    #[serde(default = "default_time")]
-    time: NaiveDateTime,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct FromClient {
-    message: String,
-    user_name: String,
-    password: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct SentToClient {
-    user_name: String,
-    room_id: i64,
-    message: String,
-    #[serde(default = "default_time")]
-    time: NaiveDateTime,
-}
-
-fn default_time() -> NaiveDateTime {
-    Utc::now().naive_utc()
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct ResponseToClient {
-    all_messages: String,
-    signed_in: bool,
-    #[serde(default = "default_id")]
-    id: String,
-}
-
-fn default_id() -> String {
-    "Anonymous".to_string()
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Room {
-    id: i64,
-    name: String,
-}
-
-struct WebSockActor {
-    all_messages: serde_json::Value,
-    db_pool: web::Data<SqlitePool>,
-    id: Identity,
-}
-
- */
 
 const ws_address = "ws://127.0.0.1:8081";
 const api_address = "http://127.0.0.1:8081";
@@ -232,6 +168,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/signup/`, requestOptions).then((res) => {
       res.json().then((body) => setAuthMsg(body));
+      ws.close();
     });
   };
 
@@ -245,6 +182,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/login/`, requestOptions).then((res) => {
       res.json().then((body) => setAuthMsg(body));
+      ws.close();
     });
   };
 
@@ -258,6 +196,7 @@ const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
     };
     fetch(`${api_address}/logout/`, requestOptions).then((res) => {
       res.json().then((body) => setAuthMsg(body));
+      ws.close();
     });
   };
 
