@@ -1,24 +1,70 @@
 import React, { useState, useRef, useEffect } from "react";
+import { AppWs } from "./AppWs";
+import { SignUpLogin } from "./SignUpLogin";
 
 const ws_address = "ws://127.0.0.1:8081";
-const api_address = "http://127.0.0.1:8081";
 
-const AppWs = ({
-  user,
-  ws,
-  setUser,
-  openSocket,
-  receivedData,
-  setReceivedData,
-  isPaused,
-  setPause,
-  reconnecting,
-}) => {
-  const [messageValue, setMessageValue] = useState(undefined);
-  const [allMessages, setAllMessages] = useState([]);
+const App = () => {
+  // DATA from server
+  const [receivedData, setReceivedData] = useState(undefined);
   const [wsMessage, setWsMessage] = useState(undefined);
+  const [allMessages, setAllMessages] = useState([]);
   const [signedInUser, setSignedInUser] = useState(undefined);
   const [allUsers, setAllUsers] = useState([]);
+
+  // FRONT END SOCKET
+  const ws = useRef(null);
+  const [isPaused, setPause] = useState(false);
+  const [reconnectingMsg, setReconnectingMsg] = useState(undefined);
+  const [attemptingSignIn, setAttemptingSignIn] = useState(false);
+
+  const defaultConnectingMsg = "Attempting to Connect";
+
+  const cleanUpReceived = () => {
+    setReceivedData(undefined);
+    setWsMessage(undefined);
+    setAllMessages([]);
+    setSignedInUser(undefined);
+    setAllUsers([]);
+  };
+
+  const openSocket = (props) => {
+    let { attemptIncrement = 0 } = props || {};
+
+    let attempt = 1 + attemptIncrement;
+    console.log(attempt);
+
+    ws.current = new WebSocket(`${ws_address}/ws/`);
+
+    ws.current.onopen = () => {
+      console.log("ws opened");
+      setReconnectingMsg(undefined);
+      if (ws?.current) {
+        ws.current.onmessage = (e) => {
+          if (isPaused) {
+            console.log("is paused");
+            return;
+          }
+          console.log({ received_data_HERE: e.data });
+          setReceivedData(e.data);
+        };
+      }
+    };
+    ws.current.onclose = () => {
+      console.log("ws closed");
+    };
+  };
+
+  // open the socket on page load
+  useEffect(() => {
+    openSocket();
+
+    const currentWS = ws?.current;
+    return () => {
+      // close the socket
+      currentWS?.close();
+    };
+  }, []);
 
   useEffect(() => {
     const receivedDataJSON = receivedData ? JSON.parse(receivedData) : {};
@@ -50,243 +96,34 @@ const AppWs = ({
     }
   }, [receivedData]);
 
-  // open the socket on page load
-  useEffect(() => {
-    openSocket();
-
-    const currentWS = ws?.current;
-    return () => {
-      // close the socket if it exists
-      currentWS?.close();
-    };
-  }, []);
-
-  // handle messaging
-  useEffect(() => {
-    if (!ws.current) {
-      console.log("no ws.current");
-    }
-
-    console.log({ ws, current_onmessage: ws.current });
-
-    ws.current.onmessage = (e) => {
-      if (isPaused) {
-        console.log("is paused");
-        return;
-      }
-      // const message = JSON.parse(e.data);
-      console.log({ received_data: e.data });
-      setReceivedData(e.data);
-    };
-  }, [ws, isPaused]);
-
-  // open change
-  const handleOpenChange = () => {
-    if (ws?.current) {
-      ws?.current?.close();
-    } else {
-      openSocket();
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const jsonObject = JSON.stringify({
-      message: messageValue,
-    });
-    ws?.current?.send && ws?.current?.send(jsonObject);
-  };
-
-  const handleChange = (e) => {
-    setMessageValue(e.target.value);
-  };
-
   return (
     <div>
-      <button onClick={() => setPause(!isPaused)}>
-        {isPaused ? "Resume" : "Pause"}
-      </button>
-      <button onClick={() => handleOpenChange()}>
-        {ws?.current ? "Close" : "Open"}
-      </button>
-      {!reconnecting && <div>{wsMessage && wsMessage}</div>}
-      <form onSubmit={handleSubmit}>
-        <input onChange={handleChange} type="text" />
-      </form>
-      <div>
-        {reconnecting ? (
-          <div>Reconnecting...</div>
-        ) : (
-          <>
-            {signedInUser && <div>Signed in as: {signedInUser}</div>}
-            {!!allMessages?.length && (
-              <div>
-                Current users:
-                {!allUsers.length ? (
-                  <span>Nobody here</span>
-                ) : (
-                  <>
-                    {allUsers.map((usr, i) => {
-                      return <span key={i + usr}>{usr}</span>;
-                    })}
-                  </>
-                )}
-              </div>
-            )}
-            {allMessages?.map((message, i) => {
-              return (
-                <div key={message?.message + i + message?.time}>
-                  <div>-</div>
-                  <div key={message?.time + message?.message}>
-                    <div>{message?.name}</div>
-                    <div>{message?.time}</div>
-                    <div>{message?.message}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const SignUpLogin = ({ user, setUser, ws, openSocket }) => {
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
-  const [authMsg, setAuthMsg] = useState(undefined);
-  const handleSignUp = (e) => {
-    e.preventDefault();
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ user_name: userName, password: password }),
-    };
-    fetch(`${api_address}/signup/`, requestOptions).then((res) => {
-      res.json().then((body) => setAuthMsg(body));
-      ws?.current?.close();
-    });
-  };
-
-  const handleSignIn = (e) => {
-    e.preventDefault();
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ user_name: userName, password: password }),
-    };
-    fetch(`${api_address}/login/`, requestOptions).then((res) => {
-      res.json().then((body) => setAuthMsg(body));
-      ws?.current?.close();
-    });
-  };
-
-  const handleLogOut = (e) => {
-    e.preventDefault();
-    const requestOptions = {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      // body: JSON.stringify({ user_name: userName, password: password }),
-    };
-    fetch(`${api_address}/logout/`, requestOptions).then((res) => {
-      res.json().then((body) => setAuthMsg(body));
-      ws?.current?.close();
-    });
-  };
-
-  const handleUserChange = (e) => {
-    setUserName(e.target.value);
-  };
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  return (
-    <div>
-      <button onClick={() => setIsLogin(!isLogin)}>
-        {isLogin ? "SignUp" : "Login"}
-      </button>
-      <div>{isLogin ? "Login" : "SignUp"}</div>
-      <form onSubmit={isLogin ? handleSignIn : handleSignUp}>
-        {authMsg && <div>{authMsg}</div>}
-        <label htmlFor="userInput">
-          Name
-          <input
-            id="userInput"
-            type="text"
-            onChange={handleUserChange}
-            value={userName}
-          />
-        </label>
-        <label htmlFor="passwordInput">
-          password
-          <input
-            id="passwordInput"
-            type="password"
-            onChange={handlePasswordChange}
-            value={password}
-          />
-        </label>
-        <input type="submit" />
-        <button onClick={handleLogOut}>Log out</button>
-      </form>
-    </div>
-  );
-};
-
-const App = () => {
-  const [user, setUser] = useState("");
-  const ws = useRef(null);
-  const [receivedData, setReceivedData] = useState(undefined);
-  const [isPaused, setPause] = useState(false);
-  const [reconnecting, setReconnecting] = useState(false);
-
-  const openSocket = () => {
-    ws.current = new WebSocket(`${ws_address}/ws/`);
-
-    ws.current.onopen = () => {
-      console.log("ws opened");
-      setReconnecting(false);
-      ws.current.onmessage = (e) => {
-        if (isPaused) {
-          console.log("is paused");
-          return;
-        }
-        // const message = JSON.parse(e.data);
-        console.log({ received_data_HERE: e.data });
-        setReceivedData(e.data);
-      };
-    };
-    ws.current.onclose = () => {
-      console.log("ws closed, attempting to reconnect");
-      setReconnecting(true);
-      setTimeout(() => {
-        openSocket();
-      }, 1000);
-    };
-  };
-
-  return (
-    <div>
-      <div>WS APP HERE YALL!</div>
-      <SignUpLogin {...{ user, setUser, ws, openSocket }} />
+      <SignUpLogin
+        {...{
+          ws,
+          openSocket,
+          setReconnectingMsg,
+          cleanUpReceived,
+          defaultConnectingMsg,
+        }}
+      />
       <AppWs
         {...{
-          user,
           ws,
-          setUser,
           openSocket,
           receivedData,
           setReceivedData,
           isPaused,
           setPause,
-          reconnecting,
+          reconnectingMsg,
+          allMessages,
+          setAllMessages,
+          wsMessage,
+          setWsMessage,
+          signedInUser,
+          setSignedInUser,
+          allUsers,
+          setAllUsers,
         }}
       />
     </div>
