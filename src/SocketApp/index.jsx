@@ -89,8 +89,8 @@ const App = () => {
       setSignedInUser(undefined);
     }
 
-    if (receivedDataJSON?.all_users) {
-      setAllUsers(receivedDataJSON.all_users);
+    if (receivedDataJSON?.all_online_users) {
+      setAllUsers(receivedDataJSON.all_online_users);
     } else {
       setAllUsers([]);
     }
@@ -98,6 +98,7 @@ const App = () => {
 
   return (
     <div>
+      <div>Rusty Chat</div>
       <SignUpLogin
         {...{
           ws,
