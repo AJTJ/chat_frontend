@@ -1,12 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { AppWs } from "./AppWs";
 import { SignUpLogin } from "./SignUpLogin";
+import testData from "./test.json";
+import { Global, theme } from "./theme";
+import { ThemeProvider } from "@emotion/react";
+import styled from "@emotion/styled";
+
+console.log({ testData });
 
 const ws_address = "ws://127.0.0.1:8081";
 
 const App = () => {
   // DATA from server
-  const [receivedData, setReceivedData] = useState(undefined);
+  const [receivedData, setReceivedData] = useState(JSON.stringify(testData));
   const [wsMessage, setWsMessage] = useState(undefined);
   const [allMessages, setAllMessages] = useState([]);
   const [signedInUser, setSignedInUser] = useState(undefined);
@@ -14,7 +20,6 @@ const App = () => {
 
   // FRONT END SOCKET
   const ws = useRef(null);
-  const [isPaused, setPause] = useState(false);
   const [reconnectingMsg, setReconnectingMsg] = useState(undefined);
   const [attemptingSignIn, setAttemptingSignIn] = useState(false);
 
@@ -36,23 +41,21 @@ const App = () => {
 
     ws.current = new WebSocket(`${ws_address}/ws/`);
 
-    ws.current.onopen = () => {
-      console.log("ws opened");
-      setReconnectingMsg(undefined);
-      if (ws?.current) {
-        ws.current.onmessage = (e) => {
-          if (isPaused) {
-            console.log("is paused");
-            return;
-          }
-          console.log({ received_data_HERE: e.data });
-          setReceivedData(e.data);
-        };
-      }
-    };
-    ws.current.onclose = () => {
-      console.log("ws closed");
-    };
+    if (ws.current) {
+      ws.current.onopen = () => {
+        console.log("ws opened");
+        setReconnectingMsg(undefined);
+        if (ws?.current) {
+          ws.current.onmessage = (e) => {
+            console.log({ received_data_HERE: e.data });
+            // setReceivedData(e.data);
+          };
+        }
+      };
+      ws.current.onclose = () => {
+        console.log("ws closed");
+      };
+    }
   };
 
   // open the socket on page load
@@ -98,7 +101,6 @@ const App = () => {
 
   return (
     <div>
-      <div>Rusty Chat</div>
       <SignUpLogin
         {...{
           ws,
@@ -106,6 +108,7 @@ const App = () => {
           setReconnectingMsg,
           cleanUpReceived,
           defaultConnectingMsg,
+          signedInUser,
         }}
       />
       <AppWs
@@ -114,8 +117,6 @@ const App = () => {
           openSocket,
           receivedData,
           setReceivedData,
-          isPaused,
-          setPause,
           reconnectingMsg,
           allMessages,
           setAllMessages,
@@ -131,4 +132,11 @@ const App = () => {
   );
 };
 
-export default App;
+const ExportedApp = () => (
+  <ThemeProvider theme={theme}>
+    <Global />
+    <App />
+  </ThemeProvider>
+);
+
+export default ExportedApp;
