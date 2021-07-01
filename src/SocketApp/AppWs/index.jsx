@@ -164,7 +164,6 @@ export const AppWs = (props) => {
               ) : (
                 <>
                   {allUsers.map((usr, i) => {
-                    console.log(usr, signedInUser);
                     return (
                       <UserName key={i + usr} isYou={usr === signedInUser}>
                         {/* {usr === signedInUser ? `${usr} (you)` : usr} */}

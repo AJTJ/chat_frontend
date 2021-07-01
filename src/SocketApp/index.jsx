@@ -46,7 +46,6 @@ const App = () => {
         setReconnectingMsg(undefined);
         if (ws?.current) {
           ws.current.onmessage = (e) => {
-            console.log({ received_data_HERE: e.data });
             setReceivedData(e.data);
           };
         }
@@ -74,8 +73,6 @@ const App = () => {
 
   useEffect(() => {
     const receivedDataJSON = receivedData ? JSON.parse(receivedData) : {};
-
-    console.log({ receivedJson: receivedDataJSON });
 
     if (receivedDataJSON?.all_messages) {
       setAllMessages(JSON.parse(receivedDataJSON.all_messages));

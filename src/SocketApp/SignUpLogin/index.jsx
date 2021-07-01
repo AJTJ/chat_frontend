@@ -148,7 +148,8 @@ export const SignUpLogin = ({
       credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/login/`, requestOptions).then(() => {
+    fetch(`${api_address}/login/`, requestOptions).then((res) => {
+      res.json().then((body) => setWsMessage(body));
       resetWs();
     });
   };
@@ -162,7 +163,6 @@ export const SignUpLogin = ({
       // body: JSON.stringify({ user_name: userName, password: password }),
     };
     fetch(`${api_address}/logout/`, requestOptions).then((res) => {
-      console.log(res);
       closeSocket({ isLogout: true });
     });
   };
