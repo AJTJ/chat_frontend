@@ -48,7 +48,8 @@ let AuthZone = styled.div`
   }
   ${mq[2]} {
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 5px 0;
   }
 `;
 
@@ -83,12 +84,18 @@ let Form = styled.form`
     ${mq[2]} {
       font-size: 10px;
       width: 100px;
+      height: 20px;
     }
   }
 `;
 
 let AuthTitle = styled.div`
   padding-right: 5px;
+  ${mq[2]} {
+    width: 50px;
+    font-size: 10px;
+    text-align: right;
+  }
 `;
 
 export const SignUpLogin = ({
