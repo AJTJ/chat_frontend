@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
+import { mq } from "../theme";
 
 const api_address = "http://127.0.0.1:8081";
 
@@ -13,18 +14,89 @@ const ColoredDiv = styled.div`
 
 let TitleBar = styled.div`
   color: ${(p) => p.theme.colors.color1};
-  font-size: 40px;
+  font-size: 25px;
   font-weight: bolder;
   background: ${(p) => p.theme.colors.color2};
   text-align: center;
-  padding: 10px 0;
+  /* padding: 10px 0; */
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 let LoginZone = styled.div`
-  height: 200px;
-  /* position: fixed; */
-  /* top: 0; */
   width: 100%;
+  height: 90px;
+`;
+
+let AuthZone = styled.div`
+  height: 50px;
+  background: ${(p) => p.theme.colors.color2};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 14px;
+
+  input[type="submit"],
+  button {
+    border-radius: 10px;
+    margin: 0 2px;
+    border: none;
+    background: ${(p) => p.theme.colors.color1};
+    color: ${(p) => p.theme.colors.color2};
+    padding: 4px 2px;
+    width: 45px;
+    font-size: 10px;
+  }
+  .alt {
+    background: ${(p) => p.theme.colors.color4};
+    color: ${(p) => p.theme.colors.color2};
+  }
+  ${mq[2]} {
+    flex-direction: column;
+    justify-content: center;
+  }
+`;
+
+let ServerMsg = styled.div`
+  height: 15px;
+  display: flex;
+  align-items: center;
+`;
+
+let AuthThings = styled.div`
+  display: flex;
+  align-items: center;
+  height: 20px;
+`;
+
+let SignedInUser = styled.div`
+  padding-right: 10px;
+`;
+
+let Form = styled.form`
+  display: flex;
+  align-items: center;
+  input[type="text"],
+  input[type="password"] {
+    height: 28px;
+    margin-right: 5px;
+    border-radius: 5px;
+    border: 1px solid black;
+    padding: 5px;
+    /* margin-top: 2px; */
+    font-size: 12px;
+    ${mq[2]} {
+      font-size: 10px;
+      width: 100px;
+    }
+  }
+`;
+
+let AuthTitle = styled.div`
+  padding-right: 5px;
 `;
 
 export const SignUpLogin = ({
@@ -34,6 +106,8 @@ export const SignUpLogin = ({
   cleanUpReceived,
   defaultConnectingMsg,
   signedInUser,
+  reconnectingMsg,
+  wsMessage,
 }) => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -115,38 +189,53 @@ export const SignUpLogin = ({
   return (
     <LoginZone>
       <TitleBar>Rusty Chat</TitleBar>
-
-      {!isLoggedIn && (
-        <>
-          <button onClick={() => setIsLoginForm(!isLoginForm)}>
-            {isLoginForm ? "SignUp" : "Login"}
-          </button>
-          <div>{isLoginForm ? "Login" : "SignUp"}</div>
-          <form onSubmit={isLoginForm ? handleSignIn : handleSignUp}>
-            {authMsg && <div>{authMsg}</div>}
-            <label htmlFor="userInput">
-              Name
-              <input
-                id="userInput"
-                type="text"
-                onChange={handleUserChange}
-                value={userName}
-              />
-            </label>
-            <label htmlFor="passwordInput">
-              password
-              <input
-                id="passwordInput"
-                type="password"
-                onChange={handlePasswordChange}
-                value={password}
-              />
-            </label>
-            <input type="submit" />
-          </form>
-        </>
-      )}
-      {isLoggedIn && <button onClick={handleLogOut}>Log out</button>}
+      <AuthZone>
+        <ServerMsg>
+          {!reconnectingMsg && wsMessage && <div>{wsMessage}</div>}
+        </ServerMsg>
+        <AuthThings>
+          {!isLoggedIn ? (
+            <>
+              <AuthTitle>{isLoginForm ? "Login" : "Sign Up"}:</AuthTitle>
+              <Form onSubmit={isLoginForm ? handleSignIn : handleSignUp}>
+                {authMsg && <div>{authMsg}</div>}
+                <input
+                  id="userInput"
+                  type="text"
+                  placeholder="Name"
+                  autoComplete="username"
+                  onChange={handleUserChange}
+                  value={userName}
+                />
+                <input
+                  id="passwordInput"
+                  placeholder="password"
+                  type="password"
+                  autoComplete={
+                    isLoginForm ? "current-password" : "new-password"
+                  }
+                  onChange={handlePasswordChange}
+                  value={password}
+                />
+                <input type="submit" />
+              </Form>
+              <button
+                className="alt"
+                onClick={() => setIsLoginForm(!isLoginForm)}
+              >
+                {isLoginForm ? "Sign Up" : "Login"}
+              </button>
+            </>
+          ) : (
+            <>
+              {signedInUser && (
+                <SignedInUser>Welcome, {signedInUser}</SignedInUser>
+              )}
+              <button onClick={handleLogOut}>Log out</button>
+            </>
+          )}
+        </AuthThings>
+      </AuthZone>
     </LoginZone>
   );
 };

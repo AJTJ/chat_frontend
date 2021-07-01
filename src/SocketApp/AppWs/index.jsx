@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "@emotion/styled";
 import moment from "moment";
+import { mq } from "../theme";
 
 const MessageContainer = styled.div`
   padding: 5px 0;
@@ -24,63 +25,82 @@ const MessageContent = styled.div`
 const MsgForm = styled.form`
   position: fixed;
   bottom: 0;
-  background: ${(p) => p.theme.colors.color1};
   width: 100%;
-  height: 50px;
+  height: 60px;
   margin: 0;
-  padding: 0;
+  padding: 10px 0 0;
+  background: ${(p) => p.theme.colors.color2};
 `;
 
-const MsgInput = styled.textarea`
-  width: 100%;
+const MsgInput = styled.input`
+  width: calc(100% - 6px);
   background: white;
-  /* max-height: 33px; */
   border-radius: 3px;
-  padding: 3px;
+  padding: 10px 3px;
   resize: none;
+  margin: 0 3px;
 `;
+
+const AllChat = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: ${(p) => p.theme.colors.color2};
+`;
+
+const UserInformation = styled.div``;
 
 const ChatSpaceContainer = styled.div`
   display: flex;
   border: 1px solid ${(p) => p.theme.colors.color1};
   border-radius: 3px;
-  padding: 10px 3px 0;
-  margin: 0 2px 200px;
-  background: ${(p) => p.theme.colors.color2};
-  max-height: calc(100vh - 60px - 250px);
+  padding: 10px 5px 10px;
+  margin: 0 5px;
+  background: white;
+  max-height: calc(100vh - 60px - 90px);
 `;
 
 const AllMessagesContainer = styled.div`
-  // height = 100vh - bottom - top - borders
-
   width: calc(100% - 120px);
-  margin-bottom: 50px;
   overflow: scroll;
   display: flex;
   flex-direction: column-reverse;
+  flex-grow: 1;
 `;
 
 const AllUsersContainer = styled.div`
   width: 120px;
   padding-left: 10px;
-  /* overflow: hidden; */
+  overflow: hidden;
   border-left: ${(p) => p.theme.colors.color4} 1px solid;
-  max-height: 100%;
+  ${mq[2]} {
+    width: 75px;
+    font-size: 10px;
+  }
 `;
 
 const AllOnlineUsersContainer = styled.div`
   padding-top: 5px;
+  padding-bottom: 50px;
   overflow: scroll;
+  overflow-x: hidden;
+  max-height: 100%;
   /* max-height: calc(100vh - 60px - 250px); */
 `;
 
 const CurUsersTitle = styled.div`
   color: ${(p) => p.theme.colors.color1};
   font-weight: bold;
+  padding-bottom: 5px;
+  /* position: fixed; */
 `;
 
 const UserName = styled.div`
   font-size: 12px;
+  ${mq[2]} {
+    /* width: 75px; */
+    font-size: 10px;
+  }
 `;
 
 export const AppWs = ({
@@ -98,7 +118,7 @@ export const AppWs = ({
   allUsers,
   setAllUsers,
 }) => {
-  const [messageValue, setMessageValue] = useState(undefined);
+  const [messageValue, setMessageValue] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -107,6 +127,8 @@ export const AppWs = ({
       message: messageValue,
     });
     ws?.current?.send && ws?.current?.send(jsonObject);
+
+    setMessageValue("");
   };
 
   const handleChange = (e) => {
@@ -114,48 +136,53 @@ export const AppWs = ({
   };
 
   return (
-    <div>
-      {!reconnectingMsg && wsMessage && <div>{wsMessage}</div>}
-      {reconnectingMsg && <div>{reconnectingMsg}</div>}
-      {signedInUser && <div>Signed in as: {signedInUser}</div>}
-      <ChatSpaceContainer>
-        <AllMessagesContainer>
-          {allMessages?.map((message, i) => {
-            let time = moment
-              .utc(message?.time)
-              .local()
-              .format("h:mm:ss a, D MMM YY");
-            return (
-              <MessageContainer key={message?.message + i + message?.time}>
-                <div key={message?.time + message?.message}>
-                  <MessageName>{message?.name}</MessageName>
-                  <MessageTime>{time}</MessageTime>
-                  <MessageContent>{message?.message}</MessageContent>
-                </div>
-              </MessageContainer>
-            );
-          })}
-        </AllMessagesContainer>
-        <AllUsersContainer>
-          <div>
-            <CurUsersTitle>Current users</CurUsersTitle>
-            <AllOnlineUsersContainer>
-              {!allUsers?.length ? (
-                <UserName>...Nobody here</UserName>
-              ) : (
-                <>
-                  {allUsers.map((usr, i) => {
-                    return <UserName key={i + usr}>{usr}</UserName>;
-                  })}
-                </>
-              )}
-            </AllOnlineUsersContainer>
-          </div>
-        </AllUsersContainer>
-      </ChatSpaceContainer>
-      {/* <MsgForm onSubmit={handleSubmit}>
-        <MsgInput onChange={handleChange} placeholder={"write a message"} />
-      </MsgForm> */}
-    </div>
+    <AllChat>
+      {reconnectingMsg ? (
+        <div>{reconnectingMsg}</div>
+      ) : (
+        <>
+          <ChatSpaceContainer>
+            <AllMessagesContainer>
+              {allMessages?.map((message, i) => {
+                let time = moment
+                  .utc(message?.time)
+                  .local()
+                  .format("h:mm:ss a, D MMM YY");
+                return (
+                  <MessageContainer key={message?.message + i + message?.time}>
+                    <div key={message?.time + message?.message}>
+                      <MessageName>{message?.name}</MessageName>
+                      <MessageTime>{time}</MessageTime>
+                      <MessageContent>{message?.message}</MessageContent>
+                    </div>
+                  </MessageContainer>
+                );
+              })}
+            </AllMessagesContainer>
+            <AllUsersContainer>
+              <CurUsersTitle>Current users</CurUsersTitle>
+              <AllOnlineUsersContainer>
+                {!allUsers?.length ? (
+                  <UserName>...Nobody here</UserName>
+                ) : (
+                  <>
+                    {allUsers.map((usr, i) => {
+                      return <UserName key={i + usr}>{usr}</UserName>;
+                    })}
+                  </>
+                )}
+              </AllOnlineUsersContainer>
+            </AllUsersContainer>
+          </ChatSpaceContainer>
+          <MsgForm onSubmit={handleSubmit}>
+            <MsgInput
+              onChange={handleChange}
+              placeholder={"write a message"}
+              value={messageValue}
+            />
+          </MsgForm>
+        </>
+      )}
+    </AllChat>
   );
 };

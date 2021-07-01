@@ -109,6 +109,8 @@ const App = () => {
           cleanUpReceived,
           defaultConnectingMsg,
           signedInUser,
+          reconnectingMsg,
+          wsMessage,
         }}
       />
       <AppWs

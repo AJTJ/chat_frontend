@@ -1,5 +1,18 @@
 import { Global as EmoGlobal, css } from "@emotion/react";
 
+import facepaint from "facepaint";
+const bps = ["400", "600", "800", "1060"];
+
+export const mq = bps.map((bp) => `@media (max-width: ${bp}px)`);
+export const mqMin = bps.map((bp) => `@media (min-width: ${bp}px)`);
+
+export const mqO = facepaint([
+  `@media(max-width: ${bps[3]}px)`,
+  `@media(max-width: ${bps[2]}px)`,
+  `@media(max-width: ${bps[1]}px)`,
+  `@media(max-width: ${bps[0]}px)`,
+]);
+
 export const theme = {
   colors: {
     color1: "#b7410e",
