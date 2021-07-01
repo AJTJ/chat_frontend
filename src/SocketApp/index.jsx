@@ -1,61 +1,62 @@
 import React, { useState, useRef, useEffect } from "react";
 import { AppWs } from "./AppWs";
 import { SignUpLogin } from "./SignUpLogin";
-import testData from "./test.json";
+// import testData from "./test.json";
 import { Global, theme } from "./theme";
 import { ThemeProvider } from "@emotion/react";
 import styled from "@emotion/styled";
-
-console.log({ testData });
 
 const ws_address = "ws://127.0.0.1:8081";
 
 const App = () => {
   // DATA from server
-  const [receivedData, setReceivedData] = useState(JSON.stringify(testData));
+  // const [receivedData, setReceivedData] = useState(JSON.stringify(testData));
+  const [receivedData, setReceivedData] = useState(undefined);
   const [wsMessage, setWsMessage] = useState(undefined);
   const [allMessages, setAllMessages] = useState([]);
   const [signedInUser, setSignedInUser] = useState(undefined);
   const [allUsers, setAllUsers] = useState([]);
 
+  console.log({ wsMessage });
+
   // FRONT END SOCKET
   const ws = useRef(null);
   const [reconnectingMsg, setReconnectingMsg] = useState(undefined);
-  const [attemptingSignIn, setAttemptingSignIn] = useState(false);
 
   const defaultConnectingMsg = "Attempting to Connect";
 
   const cleanUpReceived = () => {
     setReceivedData(undefined);
-    setWsMessage(undefined);
     setAllMessages([]);
     setSignedInUser(undefined);
     setAllUsers([]);
   };
 
   const openSocket = (props) => {
-    let { attemptIncrement = 0 } = props || {};
+    setReconnectingMsg(defaultConnectingMsg);
 
-    let attempt = 1 + attemptIncrement;
-    console.log(attempt);
+    setTimeout(() => {
+      ws.current = new WebSocket(`${ws_address}/ws/`);
 
-    ws.current = new WebSocket(`${ws_address}/ws/`);
-
-    if (ws.current) {
-      ws.current.onopen = () => {
-        console.log("ws opened");
-        setReconnectingMsg(undefined);
-        if (ws?.current) {
-          ws.current.onmessage = (e) => {
-            console.log({ received_data_HERE: e.data });
-            // setReceivedData(e.data);
-          };
-        }
-      };
-      ws.current.onclose = () => {
-        console.log("ws closed");
-      };
-    }
+      if (ws.current) {
+        // reset messages
+        setWsMessage(undefined);
+        ws.current.onopen = () => {
+          console.log("ws opened");
+          setReconnectingMsg(undefined);
+          if (ws?.current) {
+            ws.current.onmessage = (e) => {
+              console.log({ received_data_HERE: e.data });
+              setReceivedData(e.data);
+            };
+          }
+        };
+        ws.current.onclose = () => {
+          console.log("ws closed");
+        };
+      }
+      setReconnectingMsg(undefined);
+    }, 2000);
   };
 
   // open the socket on page load
@@ -83,7 +84,7 @@ const App = () => {
     if (receivedDataJSON?.message_to_client) {
       setWsMessage(receivedDataJSON.message_to_client);
     } else if (!receivedDataJSON?.is_update) {
-      setWsMessage(undefined);
+      setWsMessage(wsMessage);
     }
 
     if (receivedDataJSON?.user_name) {
@@ -108,26 +109,19 @@ const App = () => {
           setReconnectingMsg,
           cleanUpReceived,
           defaultConnectingMsg,
-          signedInUser,
           reconnectingMsg,
           wsMessage,
+          setWsMessage,
+          signedInUser,
         }}
       />
       <AppWs
         {...{
           ws,
-          openSocket,
-          receivedData,
-          setReceivedData,
           reconnectingMsg,
           allMessages,
-          setAllMessages,
-          wsMessage,
-          setWsMessage,
-          signedInUser,
-          setSignedInUser,
           allUsers,
-          setAllUsers,
+          signedInUser,
         }}
       />
     </div>

@@ -57,7 +57,7 @@ const ChatSpaceContainer = styled.div`
   padding: 10px 5px 10px;
   margin: 0 5px;
   background: white;
-  max-height: calc(100vh - 60px - 90px);
+  height: calc(100vh - 60px - 90px);
 `;
 
 const AllMessagesContainer = styled.div`
@@ -97,27 +97,15 @@ const CurUsersTitle = styled.div`
 
 const UserName = styled.div`
   font-size: 12px;
+  font-weight: ${(p) => (p.isYou ? "bold" : "normal")};
   ${mq[2]} {
     /* width: 75px; */
     font-size: 10px;
   }
 `;
 
-export const AppWs = ({
-  ws,
-  openSocket,
-  receivedData,
-  setReceivedData,
-  reconnectingMsg,
-  allMessages,
-  setAllMessages,
-  wsMessage,
-  setWsMessage,
-  signedInUser,
-  setSignedInUser,
-  allUsers,
-  setAllUsers,
-}) => {
+export const AppWs = (props) => {
+  const { ws, reconnectingMsg, allMessages, allUsers, signedInUser } = props;
   const [messageValue, setMessageValue] = useState("");
 
   const handleSubmit = (e) => {
@@ -137,52 +125,64 @@ export const AppWs = ({
 
   return (
     <AllChat>
-      {reconnectingMsg ? (
-        <div>{reconnectingMsg}</div>
-      ) : (
-        <>
-          <ChatSpaceContainer>
-            <AllMessagesContainer>
-              {allMessages?.map((message, i) => {
-                let time = moment
-                  .utc(message?.time)
-                  .local()
-                  .format("h:mm:ss a, D MMM YY");
-                return (
-                  <MessageContainer key={message?.message + i + message?.time}>
-                    <div key={message?.time + message?.message}>
-                      <MessageName>{message?.name}</MessageName>
-                      <MessageTime>{time}</MessageTime>
-                      <MessageContent>{message?.message}</MessageContent>
-                    </div>
+      <>
+        <ChatSpaceContainer>
+          <AllMessagesContainer>
+            {!!allMessages?.length
+              ? allMessages?.map((message, i) => {
+                  let time = moment
+                    .utc(message?.time)
+                    .local()
+                    .format("h:mm:ss a, D MMM YY");
+                  return (
+                    <MessageContainer
+                      key={message?.message + i + message?.time}
+                    >
+                      <div key={message?.time + message?.message}>
+                        <MessageName>{message?.name}</MessageName>
+                        <MessageTime>{time}</MessageTime>
+                        <MessageContent>{message?.message}</MessageContent>
+                      </div>
+                    </MessageContainer>
+                  );
+                })
+              : reconnectingMsg && (
+                  <MessageContainer>
+                    <MessageName>From the server</MessageName>
+                    <MessageContent>{reconnectingMsg}</MessageContent>
                   </MessageContainer>
-                );
-              })}
-            </AllMessagesContainer>
-            <AllUsersContainer>
-              <CurUsersTitle>Current users</CurUsersTitle>
-              <AllOnlineUsersContainer>
-                {!allUsers?.length ? (
-                  <UserName>...Nobody here</UserName>
-                ) : (
-                  <>
-                    {allUsers.map((usr, i) => {
-                      return <UserName key={i + usr}>{usr}</UserName>;
-                    })}
-                  </>
                 )}
-              </AllOnlineUsersContainer>
-            </AllUsersContainer>
-          </ChatSpaceContainer>
-          <MsgForm onSubmit={handleSubmit}>
-            <MsgInput
-              onChange={handleChange}
-              placeholder={"write a message"}
-              value={messageValue}
-            />
-          </MsgForm>
-        </>
-      )}
+          </AllMessagesContainer>
+          <AllUsersContainer>
+            <CurUsersTitle>Current users</CurUsersTitle>
+            <AllOnlineUsersContainer>
+              {signedInUser && !allUsers?.length ? (
+                <UserName>...Nobody here</UserName>
+              ) : !signedInUser && !allUsers?.length ? (
+                <UserName>Please Login</UserName>
+              ) : (
+                <>
+                  {allUsers.map((usr, i) => {
+                    console.log(usr, signedInUser);
+                    return (
+                      <UserName key={i + usr} isYou={usr === signedInUser}>
+                        {usr === signedInUser ? `${usr} (you)` : usr}
+                      </UserName>
+                    );
+                  })}
+                </>
+              )}
+            </AllOnlineUsersContainer>
+          </AllUsersContainer>
+        </ChatSpaceContainer>
+        <MsgForm onSubmit={handleSubmit}>
+          <MsgInput
+            onChange={handleChange}
+            placeholder={"write a message"}
+            value={messageValue}
+          />
+        </MsgForm>
+      </>
     </AllChat>
   );
 };

@@ -108,21 +108,13 @@ export const SignUpLogin = ({
   signedInUser,
   reconnectingMsg,
   wsMessage,
+  setWsMessage,
 }) => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
-  const [authMsg, setAuthMsg] = useState(undefined);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   // HIDE/SHOW authform
-  useEffect(() => {
-    if (signedInUser) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, [signedInUser]);
 
   const logoutWS = () => {
     ws?.current?.close();
@@ -131,10 +123,7 @@ export const SignUpLogin = ({
 
   const resetWs = () => {
     logoutWS();
-    setReconnectingMsg(defaultConnectingMsg);
-    setTimeout(() => {
-      openSocket();
-    }, 2000);
+    openSocket();
   };
 
   const handleSignUp = (e) => {
@@ -146,7 +135,7 @@ export const SignUpLogin = ({
       body: JSON.stringify({ user_name: userName, password: password }),
     };
     fetch(`${api_address}/signup/`, requestOptions).then((res) => {
-      res.json().then((body) => setAuthMsg(body));
+      res.json().then((body) => setWsMessage(body));
       resetWs();
     });
   };
@@ -160,7 +149,7 @@ export const SignUpLogin = ({
       body: JSON.stringify({ user_name: userName, password: password }),
     };
     fetch(`${api_address}/login/`, requestOptions).then((res) => {
-      res.json().then((body) => setAuthMsg(body));
+      res.json().then((body) => setWsMessage(body));
       resetWs();
     });
   };
@@ -174,7 +163,7 @@ export const SignUpLogin = ({
       // body: JSON.stringify({ user_name: userName, password: password }),
     };
     fetch(`${api_address}/logout/`, requestOptions).then((res) => {
-      res.json().then((body) => setAuthMsg(body));
+      res.json().then((body) => setWsMessage(body));
       logoutWS();
     });
   };
@@ -190,15 +179,12 @@ export const SignUpLogin = ({
     <LoginZone>
       <TitleBar>Rusty Chat</TitleBar>
       <AuthZone>
-        <ServerMsg>
-          {!reconnectingMsg && wsMessage && <div>{wsMessage}</div>}
-        </ServerMsg>
+        <ServerMsg>{wsMessage && <div>{wsMessage}</div>}</ServerMsg>
         <AuthThings>
-          {!isLoggedIn ? (
+          {!signedInUser ? (
             <>
               <AuthTitle>{isLoginForm ? "Login" : "Sign Up"}:</AuthTitle>
               <Form onSubmit={isLoginForm ? handleSignIn : handleSignUp}>
-                {authMsg && <div>{authMsg}</div>}
                 <input
                   id="userInput"
                   type="text"
@@ -217,7 +203,7 @@ export const SignUpLogin = ({
                   onChange={handlePasswordChange}
                   value={password}
                 />
-                <input type="submit" />
+                <input type="submit" value="Submit" />
               </Form>
               <button
                 className="alt"
