@@ -1,16 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { mq } from "../theme";
 
 const api_address = "http://127.0.0.1:8081";
-
-const ColoredDiv = styled.div`
-  background: ${(p) => {
-    let colorNum = p.num;
-
-    return p.theme.colors["color" + colorNum];
-  }};
-`;
 
 let TitleBar = styled.div`
   color: ${(p) => p.theme.colors.color1};
@@ -116,13 +108,14 @@ export const SignUpLogin = ({
 
   // HIDE/SHOW authform
 
-  const logoutWS = () => {
+  const closeSocket = (props) => {
     ws?.current?.close();
-    cleanUpReceived();
+    cleanUpReceived(props);
   };
 
   const resetWs = () => {
-    logoutWS();
+    resetNamePassword();
+    closeSocket();
     openSocket();
   };
 
@@ -148,8 +141,7 @@ export const SignUpLogin = ({
       credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/login/`, requestOptions).then((res) => {
-      res.json().then((body) => setWsMessage(body));
+    fetch(`${api_address}/login/`, requestOptions).then(() => {
       resetWs();
     });
   };
@@ -163,8 +155,8 @@ export const SignUpLogin = ({
       // body: JSON.stringify({ user_name: userName, password: password }),
     };
     fetch(`${api_address}/logout/`, requestOptions).then((res) => {
-      res.json().then((body) => setWsMessage(body));
-      logoutWS();
+      console.log(res);
+      closeSocket({ isLogout: true });
     });
   };
 
@@ -173,6 +165,11 @@ export const SignUpLogin = ({
   };
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
+  };
+
+  const resetNamePassword = () => {
+    setUserName("");
+    setPassword("");
   };
 
   return (
@@ -207,7 +204,10 @@ export const SignUpLogin = ({
               </Form>
               <button
                 className="alt"
-                onClick={() => setIsLoginForm(!isLoginForm)}
+                onClick={() => {
+                  resetNamePassword();
+                  setIsLoginForm(!isLoginForm);
+                }}
               >
                 {isLoginForm ? "Sign Up" : "Login"}
               </button>

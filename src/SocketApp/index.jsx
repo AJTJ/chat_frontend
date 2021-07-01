@@ -4,7 +4,6 @@ import { SignUpLogin } from "./SignUpLogin";
 // import testData from "./test.json";
 import { Global, theme } from "./theme";
 import { ThemeProvider } from "@emotion/react";
-import styled from "@emotion/styled";
 
 const ws_address = "ws://127.0.0.1:8081";
 
@@ -16,47 +15,49 @@ const App = () => {
   const [allMessages, setAllMessages] = useState([]);
   const [signedInUser, setSignedInUser] = useState(undefined);
   const [allUsers, setAllUsers] = useState([]);
-
-  console.log({ wsMessage });
-
-  // FRONT END SOCKET
-  const ws = useRef(null);
   const [reconnectingMsg, setReconnectingMsg] = useState(undefined);
 
   const defaultConnectingMsg = "Attempting to Connect";
+  const pleaseLoginMsg = "Please login or register";
 
-  const cleanUpReceived = () => {
+  // FRONT END SOCKET
+  const ws = useRef(null);
+
+  const cleanUpReceived = (props) => {
+    const { isLogout } = props || {};
     setReceivedData(undefined);
     setAllMessages([]);
     setSignedInUser(undefined);
     setAllUsers([]);
+    setWsMessage(isLogout ? pleaseLoginMsg : undefined);
   };
 
   const openSocket = (props) => {
     setReconnectingMsg(defaultConnectingMsg);
 
-    setTimeout(() => {
-      ws.current = new WebSocket(`${ws_address}/ws/`);
+    // setTimeout(() => {
+    ws.current = new WebSocket(`${ws_address}/ws/`);
 
-      if (ws.current) {
+    if (ws.current) {
+      ws.current.onopen = () => {
+        console.log("ws opened");
         // reset messages
         setWsMessage(undefined);
-        ws.current.onopen = () => {
-          console.log("ws opened");
-          setReconnectingMsg(undefined);
-          if (ws?.current) {
-            ws.current.onmessage = (e) => {
-              console.log({ received_data_HERE: e.data });
-              setReceivedData(e.data);
-            };
-          }
-        };
-        ws.current.onclose = () => {
-          console.log("ws closed");
-        };
-      }
-      setReconnectingMsg(undefined);
-    }, 2000);
+        setReconnectingMsg(undefined);
+        if (ws?.current) {
+          ws.current.onmessage = (e) => {
+            console.log({ received_data_HERE: e.data });
+            setReceivedData(e.data);
+          };
+        }
+      };
+      ws.current.onclose = () => {
+        console.log("ws closed");
+        if (!wsMessage) setWsMessage(pleaseLoginMsg);
+      };
+    }
+    setReconnectingMsg(undefined);
+    // }, 2000);
   };
 
   // open the socket on page load
@@ -64,6 +65,7 @@ const App = () => {
     openSocket();
 
     const currentWS = ws?.current;
+
     return () => {
       // close the socket
       currentWS?.close();

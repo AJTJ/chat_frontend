@@ -8,9 +8,9 @@ const MessageContainer = styled.div`
 `;
 
 const MessageName = styled.span`
-  color: ${(p) => p.theme.colors.color1};
+  color: ${(p) => p.isYou && p.theme.colors.color1};
   padding-right: 15px;
-  font-weight: bold;
+  font-weight: ${(p) => (p.isYou ? "bolder" : "bold")};
 `;
 
 const MessageTime = styled.span`
@@ -47,8 +47,6 @@ const AllChat = styled.div`
   flex-direction: column;
   background: ${(p) => p.theme.colors.color2};
 `;
-
-const UserInformation = styled.div``;
 
 const ChatSpaceContainer = styled.div`
   display: flex;
@@ -98,6 +96,7 @@ const CurUsersTitle = styled.div`
 const UserName = styled.div`
   font-size: 12px;
   font-weight: ${(p) => (p.isYou ? "bold" : "normal")};
+  text-decoration: ${(p) => p.isYou && "underline"};
   ${mq[2]} {
     /* width: 75px; */
     font-size: 10px;
@@ -139,7 +138,9 @@ export const AppWs = (props) => {
                       key={message?.message + i + message?.time}
                     >
                       <div key={message?.time + message?.message}>
-                        <MessageName>{message?.name}</MessageName>
+                        <MessageName isYou={message?.name === signedInUser}>
+                          {message?.name}
+                        </MessageName>
                         <MessageTime>{time}</MessageTime>
                         <MessageContent>{message?.message}</MessageContent>
                       </div>
@@ -166,7 +167,8 @@ export const AppWs = (props) => {
                     console.log(usr, signedInUser);
                     return (
                       <UserName key={i + usr} isYou={usr === signedInUser}>
-                        {usr === signedInUser ? `${usr} (you)` : usr}
+                        {/* {usr === signedInUser ? `${usr} (you)` : usr} */}
+                        {usr}
                       </UserName>
                     );
                   })}
