@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { mq } from "../theme";
 
+// const api_address = `http://${process.env.REACT_APP_WS_SERVER_ADDRESS}`;
 const api_address = "http://127.0.0.1:8081";
+
+// const api_address = "http://localhost:3000/";
 
 let TitleBar = styled.div`
   color: ${(p) => p.theme.colors.color1};
@@ -148,10 +151,15 @@ export const SignUpLogin = ({
       credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/login/`, requestOptions).then((res) => {
-      res.json().then((body) => setWsMessage(body));
-      resetWs();
-    });
+    fetch(`${api_address}/login/`, requestOptions)
+      .then((res) => {
+        console.log(res);
+        res.json().then((body) => setWsMessage(body));
+        resetWs();
+      })
+      .catch((e) => {
+        console.error("sign in error", e);
+      });
   };
 
   const handleLogOut = (e) => {
