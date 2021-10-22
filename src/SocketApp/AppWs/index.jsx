@@ -11,6 +11,7 @@ const MessageName = styled.span`
   color: ${(p) => p.isYou && p.theme.colors.color1};
   padding-right: 15px;
   font-weight: ${(p) => (p.isYou ? "bolder" : "bold")};
+  font-size: 12px;
 `;
 
 const MessageTime = styled.span`
@@ -19,7 +20,8 @@ const MessageTime = styled.span`
 `;
 
 const MessageContent = styled.div`
-  padding: 5px 0 10px;
+  padding: 0 0 5px;
+  font-size: 12px;
 `;
 
 const MsgForm = styled.form`
@@ -52,7 +54,7 @@ const ChatSpaceContainer = styled.div`
   display: flex;
   border: 1px solid ${(p) => p.theme.colors.color1};
   border-radius: 3px;
-  padding: 10px 5px 10px;
+  padding: 0 5px 0;
   margin: 0 5px;
   background: white;
   height: calc(100vh - 60px - 90px);
@@ -60,7 +62,8 @@ const ChatSpaceContainer = styled.div`
 
 const AllMessagesContainer = styled.div`
   width: calc(100% - 120px);
-  overflow: scroll;
+  /* overflow: scroll; */
+  overflow-y: scroll;
   display: flex;
   flex-direction: column-reverse;
   flex-grow: 1;
@@ -80,9 +83,9 @@ const AllUsersContainer = styled.div`
 const AllOnlineUsersContainer = styled.div`
   padding-top: 5px;
   padding-bottom: 50px;
-  overflow: scroll;
-  overflow-x: hidden;
-  max-height: 100%;
+  overflow-y: scroll;
+  /* overflow-x: hidden; */
+  height: 100%;
   /* max-height: calc(100vh - 60px - 250px); */
 `;
 
@@ -96,7 +99,7 @@ const CurUsersTitle = styled.div`
 const UserName = styled.div`
   font-size: 12px;
   font-weight: ${(p) => (p.isYou ? "bold" : "normal")};
-  text-decoration: ${(p) => p.isYou && "underline"};
+  /* text-decoration: ${(p) => p.isYou && "underline"}; */
   ${mq[2]} {
     /* width: 75px; */
     font-size: 10px;
@@ -155,8 +158,8 @@ export const AppWs = (props) => {
                 )}
           </AllMessagesContainer>
           <AllUsersContainer>
-            <CurUsersTitle>Current users</CurUsersTitle>
             <AllOnlineUsersContainer>
+              {/* <CurUsersTitle>Current users</CurUsersTitle> */}
               {signedInUser && !allUsers?.length ? (
                 <UserName>...Nobody here</UserName>
               ) : !signedInUser && !allUsers?.length ? (
@@ -167,7 +170,7 @@ export const AppWs = (props) => {
                     return (
                       <UserName key={i + usr} isYou={usr === signedInUser}>
                         {/* {usr === signedInUser ? `${usr} (you)` : usr} */}
-                        {usr}
+                        {usr === signedInUser ? `⭐️  ${usr}` : usr}
                       </UserName>
                     );
                   })}
