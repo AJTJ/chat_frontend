@@ -17,6 +17,7 @@ export const theme = {
   colors: {
     color1: "#b7410e",
     color2: "#f4f7be",
+    color2Lighter: "rgba(244, 247, 191, 0.61)",
     color3: "#e5f77d",
     color4: "#deba6f",
     color5: "#1e000e",

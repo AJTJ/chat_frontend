@@ -4,7 +4,9 @@ import moment from "moment";
 import { mq } from "../theme";
 
 const MessageContainer = styled.div`
-  padding: 5px 0;
+  padding: 5px 5px;
+  /* background: ${(p) =>
+    p.indexNum % 2 === 0 ? p.theme.colors.color2Lighter : "none"}; */
 `;
 
 const MessageName = styled.span`
@@ -54,7 +56,7 @@ const ChatSpaceContainer = styled.div`
   display: flex;
   border: 1px solid ${(p) => p.theme.colors.color1};
   border-radius: 3px;
-  padding: 0 5px 0;
+  /* padding: 0 5px 0; */
   margin: 0 5px;
   background: white;
   height: calc(100vh - 60px - 90px);
@@ -139,6 +141,7 @@ export const AppWs = (props) => {
                   return (
                     <MessageContainer
                       key={message?.message + i + message?.time}
+                      indexNum={i}
                     >
                       <div key={message?.time + message?.message}>
                         <MessageName isYou={message?.name === signedInUser}>
