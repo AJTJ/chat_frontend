@@ -1,5 +1,5 @@
 {
-  "homepage": ".",
+  "homepage": "http://AJTJ.github.io/chat_frontend",
   "name": "chat_socket",
   "version": "0.1.0",
   "private": true,
@@ -24,7 +24,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "watch": "cra-build-watch",
-    "watch_not_used": "chmod +x ./scripts/watch.js && ./scripts/watch.js"
+    "watch_not_used": "chmod +x ./scripts/watch.js && ./scripts/watch.js",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +47,7 @@
     ]
   },
   "devDependencies": {
-    "cra-build-watch": "^3.4.0"
+    "cra-build-watch": "^3.4.0",
+    "gh-pages": "^3.2.3"
   }
 }

@@ -91,12 +91,12 @@ const AllOnlineUsersContainer = styled.div`
   /* max-height: calc(100vh - 60px - 250px); */
 `;
 
-const CurUsersTitle = styled.div`
-  color: ${(p) => p.theme.colors.color1};
-  font-weight: bold;
-  padding-bottom: 5px;
-  /* position: fixed; */
-`;
+// const CurUsersTitle = styled.div`
+//   color: ${(p) => p.theme.colors.color1};
+//   font-weight: bold;
+//   padding-bottom: 5px;
+//   /* position: fixed; */
+// `;
 
 const UserName = styled.div`
   font-size: 12px;
