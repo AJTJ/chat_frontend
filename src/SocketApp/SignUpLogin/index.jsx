@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { mq } from "../theme";
 
-// const api_address = `http://${process.env.REACT_APP_WS_SERVER_ADDRESS}`;
-const api_address = "http://127.0.0.1:8081";
+const SERVER_ADDRESS = "//68.183.138.33:8081";
 
-// const api_address = "http://localhost:3000/";
+const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
 
 let TitleBar = styled.div`
   color: ${(p) => p.theme.colors.color1};
@@ -137,7 +136,7 @@ export const SignUpLogin = ({
       credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/signup/`, requestOptions).then((res) => {
+    fetch(`${AMENDED_SERVER_ADDRESS}/signup/`, requestOptions).then((res) => {
       res.json().then((body) => setWsMessage(body));
       resetWs();
     });
@@ -151,7 +150,7 @@ export const SignUpLogin = ({
       credentials: "include",
       body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/login/`, requestOptions)
+    fetch(`${AMENDED_SERVER_ADDRESS}/login/`, requestOptions)
       .then((res) => {
         console.log(res);
         res.json().then((body) => setWsMessage(body));
@@ -170,7 +169,7 @@ export const SignUpLogin = ({
       credentials: "include",
       // body: JSON.stringify({ user_name: userName, password: password }),
     };
-    fetch(`${api_address}/logout/`, requestOptions).then((res) => {
+    fetch(`${AMENDED_SERVER_ADDRESS}/logout/`, requestOptions).then((res) => {
       closeSocket({ isLogout: true });
     });
   };

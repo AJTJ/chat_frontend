@@ -5,8 +5,6 @@ import { SignUpLogin } from "./SignUpLogin";
 import { Global, theme } from "./theme";
 import { ThemeProvider } from "@emotion/react";
 
-// const ws_address = "ws://127.0.0.1:8081";
-
 const App = () => {
   // DATA from server
   // const [receivedData, setReceivedData] = useState(JSON.stringify(testData));
@@ -19,6 +17,8 @@ const App = () => {
 
   const defaultConnectingMsg = "Attempting to Connect";
   const pleaseLoginMsg = "Please login or register";
+
+  const SERVER_ADDRESS = "//68.183.138.33:8081";
 
   // FRONT END SOCKET
   const ws = useRef(null);
@@ -36,9 +36,7 @@ const App = () => {
     setReconnectingMsg(defaultConnectingMsg);
 
     // setTimeout(() => {
-    ws.current = new WebSocket(
-      `ws:${process.env.REACT_APP_WS_SERVER_ADDRESS}/ws/`
-    );
+    ws.current = new WebSocket(`wss:${SERVER_ADDRESS}/wss/`);
 
     if (ws.current) {
       ws.current.onopen = () => {
