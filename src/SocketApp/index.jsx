@@ -20,7 +20,7 @@ const App = () => {
 
   // const SERVER_ADDRESS = "//68.183.138.33:8081";
   const SERVER_ADDRESS = "//chat.thelonious.life/";
-
+  const WS_SERVER_ADDRESS = `wss:${SERVER_ADDRESS}/wss/`;
   const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
 
   // FRONT END SOCKET
@@ -39,7 +39,7 @@ const App = () => {
     setReconnectingMsg(defaultConnectingMsg);
 
     // setTimeout(() => {
-    ws.current = new WebSocket(`wss:${SERVER_ADDRESS}/wss/`);
+    ws.current = new WebSocket(WS_SERVER_ADDRESS);
 
     if (ws.current) {
       ws.current.onopen = () => {
