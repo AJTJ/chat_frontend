@@ -18,7 +18,10 @@ const App = () => {
   const defaultConnectingMsg = "Attempting to Connect";
   const pleaseLoginMsg = "Please login or register";
 
-  const SERVER_ADDRESS = "//68.183.138.33:8081";
+  // const SERVER_ADDRESS = "//68.183.138.33:8081";
+  const SERVER_ADDRESS = "//chat.thelonious.life/";
+
+  const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
 
   // FRONT END SOCKET
   const ws = useRef(null);
@@ -112,6 +115,7 @@ const App = () => {
           wsMessage,
           setWsMessage,
           signedInUser,
+          AMENDED_SERVER_ADDRESS,
         }}
       />
       <AppWs

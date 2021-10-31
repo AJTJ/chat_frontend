@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { mq } from "../theme";
 
-const SERVER_ADDRESS = "//68.183.138.33:8081";
-
-const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
-
 let TitleBar = styled.div`
   color: ${(p) => p.theme.colors.color1};
   font-size: 25px;
@@ -110,6 +106,7 @@ export const SignUpLogin = ({
   reconnectingMsg,
   wsMessage,
   setWsMessage,
+  AMENDED_SERVER_ADDRESS,
 }) => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
