@@ -46,10 +46,7 @@ const App = () => {
     setReconnectingMsg(defaultConnectingMsg);
 
     // setTimeout(() => {
-    ws.current = new WebSocket({
-      url: WS_SERVER_ADDRESS,
-      origin: "https://chat.freedivingsource.com",
-    });
+    ws.current = new WebSocket(WS_SERVER_ADDRESS);
 
     if (ws.current) {
       ws.current.onopen = () => {
