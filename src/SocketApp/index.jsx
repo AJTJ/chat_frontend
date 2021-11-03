@@ -25,10 +25,14 @@ const App = () => {
   // const WS_SERVER_ADDRESS = `ws:${SERVER_ADDRESS}/ws/`;
   // const AMENDED_SERVER_ADDRESS = `http:${SERVER_ADDRESS}`;
 
+  // console.log(process.env);
   // PROD SETUP
-  const SERVER_ADDRESS = "//chat.freedivingsource.com";
-  const WS_SERVER_ADDRESS = `wss:${SERVER_ADDRESS}/ws/`;
-  const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
+  const isDev = process?.env?.NODE_ENV === "development";
+  const SERVER_ADDRESS = isDev
+    ? "//127.0.0.1:8081"
+    : "//chat.freedivingsource.com";
+  const WS_SERVER_ADDRESS = `ws${!isDev ? "s" : ""}:${SERVER_ADDRESS}/ws/`;
+  const AMENDED_SERVER_ADDRESS = `http${!isDev ? "s" : ""}:${SERVER_ADDRESS}`;
 
   // FRONT END SOCKET
   const ws = useRef(null);

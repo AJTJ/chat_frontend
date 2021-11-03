@@ -20,6 +20,17 @@ let LoginZone = styled.div`
   height: 90px;
 `;
 
+let RegisterButton = styled.button`
+  border-radius: 10px;
+  margin: 0 2px 0 15px;
+  border: none;
+  background: ${(p) => p.theme.colors.color5};
+  color: ${(p) => p.theme.colors.color2};
+  padding: 6px 5px;
+  width: 60px;
+  font-size: 10px;
+`;
+
 let AuthZone = styled.div`
   height: 50px;
   background: ${(p) => p.theme.colors.color2};
@@ -65,6 +76,15 @@ let AuthThings = styled.div`
 
 let SignedInUser = styled.div`
   padding-right: 10px;
+  display: flex;
+`;
+
+let WelcomeName = styled.div`
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  padding: 0 0 0 5px;
 `;
 
 let Form = styled.form`
@@ -187,13 +207,28 @@ export const SignUpLogin = ({
 
   return (
     <LoginZone>
-      <TitleBar>Rusty Chat</TitleBar>
+      <TitleBar>
+        Rusty Chat
+        {!signedInUser && (
+          <RegisterButton
+            className="alt"
+            onClick={() => {
+              resetNamePassword();
+              setIsLoginForm(!isLoginForm);
+            }}
+          >
+            {isLoginForm ? "Register?" : "Login?"}
+          </RegisterButton>
+        )}
+      </TitleBar>
       <AuthZone>
         <ServerMsg>{wsMessage && <div>{wsMessage}</div>}</ServerMsg>
         <AuthThings>
           {!signedInUser ? (
             <>
-              <AuthTitle>{isLoginForm ? "Login" : "Sign Up"}:</AuthTitle>
+              <AuthTitle>
+                {isLoginForm ? "Login here" : "Register here"}
+              </AuthTitle>
               <Form onSubmit={isLoginForm ? handleSignIn : handleSignUp}>
                 <input
                   id="userInput"
@@ -215,20 +250,13 @@ export const SignUpLogin = ({
                 />
                 <input type="submit" value="Submit" />
               </Form>
-              <button
-                className="alt"
-                onClick={() => {
-                  resetNamePassword();
-                  setIsLoginForm(!isLoginForm);
-                }}
-              >
-                {isLoginForm ? "Sign Up" : "Login"}
-              </button>
             </>
           ) : (
             <>
               {signedInUser && (
-                <SignedInUser>Welcome, {signedInUser}</SignedInUser>
+                <SignedInUser>
+                  Welcome, <WelcomeName>{signedInUser}</WelcomeName>
+                </SignedInUser>
               )}
               <button onClick={handleLogOut}>Log out</button>
             </>

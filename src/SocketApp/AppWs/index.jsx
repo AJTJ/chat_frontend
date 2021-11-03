@@ -5,11 +5,13 @@ import { mq } from "../theme";
 
 const MessageContainer = styled.div`
   padding: 0 5px;
+  color: ${(p) => p.theme.colors.color3};
   /* background: ${(p) =>
     p.indexNum % 2 === 0 ? p.theme.colors.color2Lighter : "none"}; */
 `;
 
 const MessageName = styled.span`
+  color: ${(p) => p.theme.colors.color3};
   color: ${(p) => p.isYou && p.theme.colors.color1};
   font-weight: ${(p) => (p.isYou ? "bolder" : "bold")};
   font-size: 12px;
@@ -40,11 +42,12 @@ const MsgForm = styled.form`
 
 const MsgInput = styled.input`
   width: calc(100% - 6px);
-  background: white;
   border-radius: 3px;
   padding: 10px 3px;
   resize: none;
   margin: 0 3px;
+  background: ${(p) => p.theme.colors.color5};
+  color: ${(p) => p.theme.colors.color3};
 `;
 
 const AllChat = styled.div`
@@ -71,26 +74,48 @@ const AllMessagesContainer = styled.div`
   display: flex;
   flex-direction: column-reverse;
   flex-grow: 1;
+  background: ${(p) => p.theme.colors.color5};
+  scrollbar-color: ${(p) =>
+    `${p.theme.colors.color5} ${p.theme.colors.color4}`};
+  ::-webkit-scrollbar {
+    background: ${(p) => p.theme.colors.color4};
+  }
+  ::-webkit-scrollbar-thumb {
+    background: ${(p) => p.theme.colors.color5};
+    border-radius: 10px;
+    border: ${(p) => p.theme.colors.color4} 1px solid;
+  }
 `;
 
 const AllUsersContainer = styled.div`
   width: 120px;
   padding-left: 10px;
-  overflow: hidden;
+  overflow-y: hidden;
   border-left: ${(p) => p.theme.colors.color4} 1px solid;
   ${mq[2]} {
     width: 75px;
     font-size: 10px;
   }
+  background: ${(p) => p.theme.colors.color5};
+  color: ${(p) => p.theme.colors.color3};
 `;
 
 const AllOnlineUsersContainer = styled.div`
   padding-top: 5px;
   padding-bottom: 50px;
   overflow-y: scroll;
-  /* overflow-x: hidden; */
+  overflow-x: hidden;
   height: 100%;
-  /* max-height: calc(100vh - 60px - 250px); */
+  scrollbar-color: ${(p) =>
+    `${p.theme.colors.color5} ${p.theme.colors.color4}`};
+  ::-webkit-scrollbar {
+    background: ${(p) => p.theme.colors.color4};
+  }
+  ::-webkit-scrollbar-thumb {
+    background: ${(p) => p.theme.colors.color5};
+    border-radius: 10px;
+    border: ${(p) => p.theme.colors.color4} 1px solid;
+  }
 `;
 
 // const CurUsersTitle = styled.div`
@@ -102,12 +127,16 @@ const AllOnlineUsersContainer = styled.div`
 
 const UserName = styled.div`
   font-size: 12px;
+  white-space: nowrap;
   font-weight: ${(p) => (p.isYou ? "bold" : "normal")};
   /* text-decoration: ${(p) => p.isYou && "underline"}; */
   ${mq[2]} {
     /* width: 75px; */
     font-size: 10px;
   }
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
 `;
 
 export const AppWs = (props) => {
@@ -180,7 +209,7 @@ export const AppWs = (props) => {
                     return (
                       <UserName key={i + usr} isYou={usr === signedInUser}>
                         {/* {usr === signedInUser ? `${usr} (you)` : usr} */}
-                        {usr === signedInUser ? `⭐️  ${usr}` : usr}
+                        {usr === signedInUser ? `⭐️ ${usr}` : usr}
                       </UserName>
                     );
                   })}
