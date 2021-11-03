@@ -10,18 +10,27 @@ const MessageContainer = styled.div`
     p.indexNum % 2 === 0 ? p.theme.colors.color2Lighter : "none"}; */
 `;
 
+const NameTime = styled.div`
+  padding: 15px 15px 5px 0;
+  display: flex;
+`;
+
 const MessageName = styled.span`
-  color: ${(p) => p.theme.colors.color3};
+  display: inline-block;
+  color: ${(p) => p.theme.colors.color2};
   color: ${(p) => p.isYou && p.theme.colors.color1};
   font-weight: ${(p) => (p.isYou ? "bolder" : "bold")};
   font-size: 12px;
-  padding: 15px 15px 0 0;
   display: inline-block;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const MessageTime = styled.span`
-  color: ${(p) => p.theme.colors.color4};
-  font-size: 11px;
+  color: ${(p) => p.theme.colors.color2Lighter};
+  font-size: 12px;
+  padding-left: 10px;
 `;
 
 const MessageContent = styled.div`
@@ -183,12 +192,12 @@ export const AppWs = (props) => {
                   >
                     <div key={message?.time + message?.message}>
                       {!nextIsSame && (
-                        <>
+                        <NameTime>
                           <MessageName isYou={message?.name === signedInUser}>
                             {message?.name}
                           </MessageName>
                           <MessageTime>{time}</MessageTime>
-                        </>
+                        </NameTime>
                       )}
                       <MessageContent>{message?.message}</MessageContent>
                     </div>
