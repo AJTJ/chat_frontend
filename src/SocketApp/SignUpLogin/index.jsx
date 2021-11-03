@@ -3,16 +3,22 @@ import styled from "@emotion/styled";
 import { mq } from "../theme";
 
 let TitleBar = styled.div`
-  color: ${(p) => p.theme.colors.color1};
-  font-size: 25px;
-  font-weight: bolder;
   background: ${(p) => p.theme.colors.color2};
   text-align: center;
-  /* padding: 10px 0; */
+  position: relative;
   height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const Title = styled.span`
+  color: ${(p) => p.theme.colors.color1};
+  font-size: 40px;
+  font-weight: bolder;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 1;
 `;
 
 let LoginZone = styled.div`
@@ -21,6 +27,8 @@ let LoginZone = styled.div`
 `;
 
 let RegisterButton = styled.button`
+  position: absolute;
+  right: 5px;
   border-radius: 10px;
   margin: 0 2px 0 15px;
   border: none;
@@ -208,7 +216,7 @@ export const SignUpLogin = ({
   return (
     <LoginZone>
       <TitleBar>
-        Rusty Chat
+        <Title>Rusty Chat</Title>
         {!signedInUser && (
           <RegisterButton
             className="alt"

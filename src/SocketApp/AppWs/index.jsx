@@ -75,7 +75,7 @@ const ChatSpaceContainer = styled.div`
   border-radius: 3px;
   /* padding: 0 5px 0; */
   margin: 0 5px;
-  /* flex-grow: 2; */
+  flex-grow: 2;
   /* max-height: calc(100% - 100px); */
   overflow: hidden;
   /* height: 100%; */
