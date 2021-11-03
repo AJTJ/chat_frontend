@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "@emotion/styled";
 import moment from "moment";
 import { mq } from "../theme";
+import bingus from "../../assets/bingus.png";
 
 const MessageContainer = styled.div`
   padding: 0 5px;
@@ -25,6 +26,11 @@ const MessageName = styled.span`
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const NameImg = styled.img`
+  height: 15px;
+  width: 15px;
 `;
 
 const MessageTime = styled.span`
@@ -194,7 +200,10 @@ export const AppWs = (props) => {
                       {!nextIsSame && (
                         <NameTime>
                           <MessageName isYou={message?.name === signedInUser}>
-                            {message?.name}
+                            {message?.name}{" "}
+                            {message?.name === "bingus" && (
+                              <NameImg src={bingus} alt="" />
+                            )}
                           </MessageName>
                           <MessageTime>{time}</MessageTime>
                         </NameTime>
