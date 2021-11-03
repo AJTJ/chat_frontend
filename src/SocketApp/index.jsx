@@ -21,14 +21,14 @@ const App = () => {
   //68.183.138.33:8081;
 
   // LOCAL SETUP
-  // const SERVER_ADDRESS = "//127.0.0.1:8081";
-  // const WS_SERVER_ADDRESS = `ws:${SERVER_ADDRESS}/ws/`;
-  // const AMENDED_SERVER_ADDRESS = `http:${SERVER_ADDRESS}`;
+  const SERVER_ADDRESS = "//127.0.0.1:8081";
+  const WS_SERVER_ADDRESS = `ws:${SERVER_ADDRESS}/ws/`;
+  const AMENDED_SERVER_ADDRESS = `http:${SERVER_ADDRESS}`;
 
   // PROD SETUP
-  const SERVER_ADDRESS = "//chat.freedivingsource.com";
-  const WS_SERVER_ADDRESS = `wss:${SERVER_ADDRESS}/ws/`;
-  const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
+  // const SERVER_ADDRESS = "//chat.freedivingsource.com";
+  // const WS_SERVER_ADDRESS = `wss:${SERVER_ADDRESS}/ws/`;
+  // const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
 
   // FRONT END SOCKET
   const ws = useRef(null);
@@ -45,6 +45,7 @@ const App = () => {
   const openSocket = (props) => {
     setReconnectingMsg(defaultConnectingMsg);
 
+    // origin: "https://chat.freedivingsource.com"
     // setTimeout(() => {
     ws.current = new WebSocket(WS_SERVER_ADDRESS);
 

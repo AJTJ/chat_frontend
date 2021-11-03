@@ -4,16 +4,17 @@ import moment from "moment";
 import { mq } from "../theme";
 
 const MessageContainer = styled.div`
-  padding: 5px 5px;
+  padding: 0 5px;
   /* background: ${(p) =>
     p.indexNum % 2 === 0 ? p.theme.colors.color2Lighter : "none"}; */
 `;
 
 const MessageName = styled.span`
   color: ${(p) => p.isYou && p.theme.colors.color1};
-  padding-right: 15px;
   font-weight: ${(p) => (p.isYou ? "bolder" : "bold")};
   font-size: 12px;
+  padding: 15px 15px 0 0;
+  display: inline-block;
 `;
 
 const MessageTime = styled.span`
@@ -22,8 +23,9 @@ const MessageTime = styled.span`
 `;
 
 const MessageContent = styled.div`
-  padding: 0 0 5px;
+  padding: 2px 0;
   font-size: 12px;
+  line-height: 15px;
 `;
 
 const MsgForm = styled.form`
@@ -134,6 +136,7 @@ export const AppWs = (props) => {
           <AllMessagesContainer>
             {!!allMessages?.length
               ? allMessages?.map((message, i) => {
+                  let nextIsSame = allMessages[i + 1]?.name === message.name;
                   let time = moment
                     .utc(message?.time)
                     .local()
@@ -144,10 +147,14 @@ export const AppWs = (props) => {
                       indexNum={i}
                     >
                       <div key={message?.time + message?.message}>
-                        <MessageName isYou={message?.name === signedInUser}>
-                          {message?.name}
-                        </MessageName>
-                        <MessageTime>{time}</MessageTime>
+                        {!nextIsSame && (
+                          <>
+                            <MessageName isYou={message?.name === signedInUser}>
+                              {message?.name}
+                            </MessageName>
+                            <MessageTime>{time}</MessageTime>
+                          </>
+                        )}
                         <MessageContent>{message?.message}</MessageContent>
                       </div>
                     </MessageContainer>
