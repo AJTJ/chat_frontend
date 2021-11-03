@@ -19,8 +19,9 @@ const App = () => {
   const pleaseLoginMsg = "Please login or register";
 
   // const SERVER_ADDRESS = "//68.183.138.33:8081";
+  // const SERVER_ADDRESS = "//127.0.0.1:8081";
   const SERVER_ADDRESS = "//chat.freedivingsource.com";
-  const WS_SERVER_ADDRESS = `wss:${SERVER_ADDRESS}`;
+  const WS_SERVER_ADDRESS = `wss:${SERVER_ADDRESS}/ws/`;
   const AMENDED_SERVER_ADDRESS = `https:${SERVER_ADDRESS}`;
 
   // FRONT END SOCKET

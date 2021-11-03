@@ -150,7 +150,9 @@ export const SignUpLogin = ({
     fetch(`${AMENDED_SERVER_ADDRESS}/login/`, requestOptions)
       .then((res) => {
         console.log(res);
-        res.json().then((body) => setWsMessage(body));
+        const jsonData = res.json();
+        console.log({ jsonData });
+        jsonData.then((body) => setWsMessage(body));
         resetWs();
       })
       .catch((e) => {
