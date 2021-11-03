@@ -4,6 +4,14 @@ import { SignUpLogin } from "./SignUpLogin";
 // import testData from "./test.json";
 import { Global, theme } from "./theme";
 import { ThemeProvider } from "@emotion/react";
+import styled from "@emotion/styled";
+
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+`;
 
 const App = () => {
   // DATA from server
@@ -115,7 +123,7 @@ const App = () => {
   }, [receivedData]);
 
   return (
-    <div>
+    <AppContainer>
       <SignUpLogin
         {...{
           ws,
@@ -139,7 +147,7 @@ const App = () => {
           signedInUser,
         }}
       />
-    </div>
+    </AppContainer>
   );
 };
 

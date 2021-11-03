@@ -31,12 +31,13 @@ const MessageContent = styled.div`
 `;
 
 const MsgForm = styled.form`
-  position: fixed;
-  bottom: 0;
+  /* position: fixed; */
+  /* bottom: 0; */
+  /* flex-grow: 1; */
   width: 100%;
   height: 60px;
   margin: 0;
-  padding: 10px 0 0;
+  padding: 10px 0 10px;
   background: ${(p) => p.theme.colors.color2};
 `;
 
@@ -53,6 +54,8 @@ const MsgInput = styled.input`
 const AllChat = styled.div`
   width: 100%;
   display: flex;
+  height: calc(100% - 90px);
+  /* flex-grow: 1; */
   flex-direction: column;
   background: ${(p) => p.theme.colors.color2};
 `;
@@ -63,13 +66,17 @@ const ChatSpaceContainer = styled.div`
   border-radius: 3px;
   /* padding: 0 5px 0; */
   margin: 0 5px;
-  background: white;
-  height: calc(100vh - 60px - 90px);
+  /* flex-grow: 2; */
+  /* max-height: calc(100% - 100px); */
+  overflow: hidden;
+  /* height: 100%; */
+  /* height: calc(100vh - 60px - 90px); */
 `;
 
 const AllMessagesContainer = styled.div`
   width: calc(100% - 120px);
   /* overflow: scroll; */
+  overflow: hidden;
   overflow-y: scroll;
   display: flex;
   flex-direction: column-reverse;
@@ -160,72 +167,70 @@ export const AppWs = (props) => {
 
   return (
     <AllChat>
-      <>
-        <ChatSpaceContainer>
-          <AllMessagesContainer>
-            {!!allMessages?.length
-              ? allMessages?.map((message, i) => {
-                  let nextIsSame = allMessages[i + 1]?.name === message.name;
-                  let time = moment
-                    .utc(message?.time)
-                    .local()
-                    .format("h:mm:ss a, D MMM YY");
-                  return (
-                    <MessageContainer
-                      key={message?.message + i + message?.time}
-                      indexNum={i}
-                    >
-                      <div key={message?.time + message?.message}>
-                        {!nextIsSame && (
-                          <>
-                            <MessageName isYou={message?.name === signedInUser}>
-                              {message?.name}
-                            </MessageName>
-                            <MessageTime>{time}</MessageTime>
-                          </>
-                        )}
-                        <MessageContent>{message?.message}</MessageContent>
-                      </div>
-                    </MessageContainer>
-                  );
-                })
-              : reconnectingMsg && (
-                  <MessageContainer>
-                    <MessageName>From the server</MessageName>
-                    <MessageContent>{reconnectingMsg}</MessageContent>
+      <ChatSpaceContainer>
+        <AllMessagesContainer>
+          {!!allMessages?.length
+            ? allMessages?.map((message, i) => {
+                let nextIsSame = allMessages[i + 1]?.name === message.name;
+                let time = moment
+                  .utc(message?.time)
+                  .local()
+                  .format("h:mm:ss a, D MMM YY");
+                return (
+                  <MessageContainer
+                    key={message?.message + i + message?.time}
+                    indexNum={i}
+                  >
+                    <div key={message?.time + message?.message}>
+                      {!nextIsSame && (
+                        <>
+                          <MessageName isYou={message?.name === signedInUser}>
+                            {message?.name}
+                          </MessageName>
+                          <MessageTime>{time}</MessageTime>
+                        </>
+                      )}
+                      <MessageContent>{message?.message}</MessageContent>
+                    </div>
                   </MessageContainer>
-                )}
-          </AllMessagesContainer>
-          <AllUsersContainer>
-            <AllOnlineUsersContainer>
-              {/* <CurUsersTitle>Current users</CurUsersTitle> */}
-              {signedInUser && !allUsers?.length ? (
-                <UserName>...Nobody here</UserName>
-              ) : !signedInUser && !allUsers?.length ? (
-                <UserName>Please Login</UserName>
-              ) : (
-                <>
-                  {allUsers.map((usr, i) => {
-                    return (
-                      <UserName key={i + usr} isYou={usr === signedInUser}>
-                        {/* {usr === signedInUser ? `${usr} (you)` : usr} */}
-                        {usr === signedInUser ? `⭐️ ${usr}` : usr}
-                      </UserName>
-                    );
-                  })}
-                </>
+                );
+              })
+            : reconnectingMsg && (
+                <MessageContainer>
+                  <MessageName>From the server</MessageName>
+                  <MessageContent>{reconnectingMsg}</MessageContent>
+                </MessageContainer>
               )}
-            </AllOnlineUsersContainer>
-          </AllUsersContainer>
-        </ChatSpaceContainer>
-        <MsgForm onSubmit={handleSubmit}>
-          <MsgInput
-            onChange={handleChange}
-            placeholder={"write a message"}
-            value={messageValue}
-          />
-        </MsgForm>
-      </>
+        </AllMessagesContainer>
+        <AllUsersContainer>
+          <AllOnlineUsersContainer>
+            {/* <CurUsersTitle>Current users</CurUsersTitle> */}
+            {signedInUser && !allUsers?.length ? (
+              <UserName>...Nobody here</UserName>
+            ) : !signedInUser && !allUsers?.length ? (
+              <UserName>Please Login</UserName>
+            ) : (
+              <>
+                {allUsers.map((usr, i) => {
+                  return (
+                    <UserName key={i + usr} isYou={usr === signedInUser}>
+                      {/* {usr === signedInUser ? `${usr} (you)` : usr} */}
+                      {usr === signedInUser ? `⭐️ ${usr}` : usr}
+                    </UserName>
+                  );
+                })}
+              </>
+            )}
+          </AllOnlineUsersContainer>
+        </AllUsersContainer>
+      </ChatSpaceContainer>
+      <MsgForm onSubmit={handleSubmit}>
+        <MsgInput
+          onChange={handleChange}
+          placeholder={"write a message"}
+          value={messageValue}
+        />
+      </MsgForm>
     </AllChat>
   );
 };
