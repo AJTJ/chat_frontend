@@ -1,19 +1,20 @@
 {
   "files": {
-    "main.js": "/chat_frontend/static/js/main.08c61ca5.chunk.js",
-    "main.js.map": "/chat_frontend/static/js/main.08c61ca5.chunk.js.map",
+    "main.js": "/chat_frontend/static/js/main.8a61569a.chunk.js",
+    "main.js.map": "/chat_frontend/static/js/main.8a61569a.chunk.js.map",
     "runtime-main.js": "/chat_frontend/static/js/runtime-main.6e186e24.js",
     "runtime-main.js.map": "/chat_frontend/static/js/runtime-main.6e186e24.js.map",
-    "static/js/2.ad73c256.chunk.js": "/chat_frontend/static/js/2.ad73c256.chunk.js",
-    "static/js/2.ad73c256.chunk.js.map": "/chat_frontend/static/js/2.ad73c256.chunk.js.map",
+    "static/js/2.7faad776.chunk.js": "/chat_frontend/static/js/2.7faad776.chunk.js",
+    "static/js/2.7faad776.chunk.js.map": "/chat_frontend/static/js/2.7faad776.chunk.js.map",
     "static/js/3.1d0f09bd.chunk.js": "/chat_frontend/static/js/3.1d0f09bd.chunk.js",
     "static/js/3.1d0f09bd.chunk.js.map": "/chat_frontend/static/js/3.1d0f09bd.chunk.js.map",
     "index.html": "/chat_frontend/index.html",
-    "static/js/2.ad73c256.chunk.js.LICENSE.txt": "/chat_frontend/static/js/2.ad73c256.chunk.js.LICENSE.txt"
+    "static/js/2.7faad776.chunk.js.LICENSE.txt": "/chat_frontend/static/js/2.7faad776.chunk.js.LICENSE.txt",
+    "static/media/bingus.279d8555.png": "/chat_frontend/static/media/bingus.279d8555.png"
   },
   "entrypoints": [
     "static/js/runtime-main.6e186e24.js",
-    "static/js/2.ad73c256.chunk.js",
-    "static/js/main.08c61ca5.chunk.js"
+    "static/js/2.7faad776.chunk.js",
+    "static/js/main.8a61569a.chunk.js"
   ]
 }
